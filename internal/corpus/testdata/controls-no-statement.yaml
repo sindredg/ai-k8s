@@ -1,0 +1,4 @@
+controls:
+  - slug: empty-control
+    statement: ""
+    proof: worklog/phase-01-infrastructure.md

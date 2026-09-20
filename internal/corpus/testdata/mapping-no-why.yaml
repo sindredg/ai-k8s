@@ -1,0 +1,5 @@
+mapping:
+  BINARY_AUTHORIZATION_DISABLED:
+    - resource: //container.googleapis.com/projects/p/locations/l/clusters/k8-lab
+      cite:
+        - threat:10

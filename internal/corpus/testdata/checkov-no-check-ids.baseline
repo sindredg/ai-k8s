@@ -1,0 +1,5 @@
+{
+    "failed_checks": [
+        { "file": "/terraform/main.tf", "findings": [ { "resource": "module.a.b", "check_ids": [] } ] }
+    ]
+}
