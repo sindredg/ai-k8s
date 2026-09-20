@@ -94,6 +94,16 @@ one produces a monitored resource the alert policy does not match, and that fail
 triage-worker -subscription scc-triage -ledger-bucket k8-lab-verdicts-<project> -corpus /corpus/corpus.json
 ```
 
+It serves two probe paths on `:8080` and nothing else. The worker handles no traffic, so without
+them a wedged pull loop is invisible: the process stays up and triages nothing.
+
+| Path | Answers |
+| --- | --- |
+| `/readyz` | 200 once the pull loop is running. Not ready while the three clients open |
+| `/healthz` | 200 unless `-idle-limit` (24h) passes with no message. True throughout startup, so liveness never kills a Pod that is merely slow to start |
+
+An idle subscription is the normal state, which is why the budget is a day rather than minutes.
+
 ## Scope
 
 The worker triages everything except `VULNERABILITY`, which covers misconfiguration, external
