@@ -13,6 +13,7 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,6 +23,7 @@ import (
 
 	"github.com/sindredg/ai-k8s/internal/corpus"
 	"github.com/sindredg/ai-k8s/internal/gcp"
+	"github.com/sindredg/ai-k8s/internal/health"
 	"github.com/sindredg/ai-k8s/internal/ledger"
 	"github.com/sindredg/ai-k8s/internal/notify"
 	"github.com/sindredg/ai-k8s/internal/verdict"
@@ -33,37 +35,61 @@ func main() {
 	subscription := flag.String("subscription", "scc-triage", "the one subscription this identity may pull")
 	bucket := flag.String("ledger-bucket", "", "the verdict ledger bucket")
 	reportEvery := flag.Duration("report-every", 5*time.Minute, "how often to log the counters")
+	probeAddr := flag.String("probe-addr", ":8080", "where the kubelet reads /healthz and /readyz")
+	idleLimit := flag.Duration("idle-limit", 24*time.Hour, "report not live after this long with no message; 0 disables it")
 	flag.Parse()
 
 	log := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}))
 	slog.SetDefault(log)
 
-	if err := run(*corpusPath, *subscription, *bucket, *reportEvery, log); err != nil {
+	if err := run(settings{
+		corpusPath:   *corpusPath,
+		subscription: *subscription,
+		bucketName:   *bucket,
+		reportEvery:  *reportEvery,
+		probeAddr:    *probeAddr,
+		idleLimit:    *idleLimit,
+	}, log); err != nil {
 		log.Error("the worker stopped", "error", err)
 		os.Exit(1)
 	}
 }
 
-func run(corpusPath, subscription, bucketName string, reportEvery time.Duration, log *slog.Logger) error {
+// settings are the flags, gathered so run takes one argument rather than six.
+type settings struct {
+	corpusPath   string
+	subscription string
+	bucketName   string
+	reportEvery  time.Duration
+	probeAddr    string
+	idleLimit    time.Duration
+}
+
+func run(s settings, log *slog.Logger) error {
 	// Refuse at startup rather than emitting entries the alert policy silently does not match.
 	pod, err := notify.PodIdentityFrom(os.Getenv)
 	if err != nil {
 		return err
 	}
-	if bucketName == "" {
+	if s.bucketName == "" {
 		return errors.New("-ledger-bucket is required")
 	}
-
-	index, err := loadCorpus(corpusPath)
-	if err != nil {
-		return err
-	}
-	log.Info("corpus loaded", "entries", len(index.Entries), "categories", len(index.Mapping), "path", corpusPath)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	bucket, closeBucket, err := gcp.NewBucket(ctx, bucketName)
+	// Serving before the clients open means a slow startup reads as not ready rather than as a
+	// crash, and liveness answers throughout.
+	probes := health.New(s.idleLimit)
+	go serveProbes(ctx, s.probeAddr, probes, log)
+
+	index, err := loadCorpus(s.corpusPath)
+	if err != nil {
+		return err
+	}
+	log.Info("corpus loaded", "entries", len(index.Entries), "categories", len(index.Mapping), "path", s.corpusPath)
+
+	bucket, closeBucket, err := gcp.NewBucket(ctx, s.bucketName)
 	if err != nil {
 		return err
 	}
@@ -90,14 +116,16 @@ func run(corpusPath, subscription, bucketName string, reportEvery time.Duration,
 	defer client.Close()
 
 	// One replica, one message at a time. Throughput is not the constraint here; a model call will be.
-	sub := client.Subscriber(subscription)
+	sub := client.Subscriber(s.subscription)
 	sub.ReceiveSettings.NumGoroutines = 1
 	sub.ReceiveSettings.MaxOutstandingMessages = 1
 
-	go report(ctx, w, reportEvery, log)
+	go report(ctx, w, s.reportEvery, log)
 
-	log.Info("pulling", "subscription", subscription, "bucket", bucketName, "namespace", pod.Namespace, "pod", pod.PodName)
+	log.Info("pulling", "subscription", s.subscription, "bucket", s.bucketName, "namespace", pod.Namespace, "pod", pod.PodName)
+	probes.Started()
 	if err := sub.Receive(ctx, func(ctx context.Context, m *pubsub.Message) {
+		probes.Seen()
 		w.Handle(ctx, message{m})
 	}); err != nil && ctx.Err() == nil {
 		return fmt.Errorf("receive: %w", err)
@@ -141,6 +169,26 @@ func report(ctx context.Context, w *worker.Worker, every time.Duration, log *slo
 			}
 			log.Info("counters", "counts", json.RawMessage(counts))
 		}
+	}
+}
+
+// serveProbes answers the kubelet. A failure here is logged rather than fatal: the worker triaging
+// findings matters more than the probe server, and a dead probe server fails the liveness check anyway.
+func serveProbes(ctx context.Context, addr string, probes *health.State, log *slog.Logger) {
+	server := &http.Server{
+		Addr:              addr,
+		Handler:           probes.Handler(),
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	go func() {
+		<-ctx.Done()
+		shutdown, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = server.Shutdown(shutdown)
+	}()
+
+	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Error("the probe server stopped", "error", err)
 	}
 }
 
