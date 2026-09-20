@@ -1,0 +1,5 @@
+{
+    "failed_checks": [
+        { "file": "/terraform/main.tf", "findings": [ { "resource": "", "check_ids": ["CKV_GCP_1"] } ] }
+    ]
+}

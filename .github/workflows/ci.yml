@@ -1,0 +1,51 @@
+# The corpus is compiled at build time, so a malformed entry, an id collision, a citation that does
+# not resolve or a pairing with no reason has to fail here rather than at runtime in the worker.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: ai-k8s
+
+      # The first three corpus sources live in k8-lab. Read-only, and no credential is used.
+      - uses: actions/checkout@v5
+        with:
+          repository: sindredg/k8-lab
+          path: k8-lab
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: ai-k8s/go.mod
+          cache-dependency-path: ai-k8s/go.sum
+
+      - name: Formatting
+        working-directory: ai-k8s
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+
+      - name: Vet
+        working-directory: ai-k8s
+        run: go vet ./...
+
+      - name: Test
+        working-directory: ai-k8s
+        run: go test -race ./...
+
+      # The mapping is hand-written against the live findings, so this is where a wrong pairing dies.
+      - name: Compile the corpus
+        working-directory: ai-k8s
+        run: go run ./cmd/corpusc -k8-lab ../k8-lab -corpus corpus -out corpus.json
+
+      - name: Build
+        working-directory: ai-k8s
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./...

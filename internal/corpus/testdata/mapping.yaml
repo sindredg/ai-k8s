@@ -1,0 +1,8 @@
+mapping:
+  BINARY_AUTHORIZATION_DISABLED:
+    - resource: //container.googleapis.com/projects/p/locations/l/clusters/k8-lab
+      cite:
+        - checkov:CKV_GCP_20:module.gke.google_container_cluster.main
+        - threat:10
+      why: The cluster runs no Binary Authorization, accepted as threat model finding 10.
+  PRIMITIVE_ROLES_USED: []
