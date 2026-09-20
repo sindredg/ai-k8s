@@ -1,0 +1,6 @@
+mapping:
+  BINARY_AUTHORIZATION_DISABLED:
+    - resource: //container.googleapis.com/projects/p/locations/europe-north1-a/clusters/k8-lab
+      cite:
+        - decision:this-anchor-does-not-exist
+      why: A pairing citing something that is not in the corpus.

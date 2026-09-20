@@ -1,0 +1,57 @@
+# The controls this platform enforces, as citable facts.
+#
+# Nothing else in the corpus asserts that a control held. The checkov baseline records what was
+# accepted, the threat model records what was found, and decisions.md records what was chosen.
+# A threat finding needs the fourth thing: that a guardrail was in place and did its job.
+#
+# Every entry points at the worklog that proved it. A control with no proof fails the build, because
+# an unproven control is a claim, not a fact, and a verdict may not cite a claim.
+
+controls:
+  - slug: pod-security-restricted-agents
+    statement: The agents namespace enforces the Pod Security restricted standard at admission, so a privileged container is refused rather than run.
+    proof: k8-lab worklog/phase-15-scc-triage.md#both-guardrails-reject-separately, a probe Pod built to trip only Pod Security, refused by name
+
+  - slug: quota-agents
+    statement: The agents namespace carries a ResourceQuota and a LimitRange that reject an oversized Pod at admission.
+    proof: k8-lab worklog/phase-15-scc-triage.md#both-guardrails-reject-separately, a probe built to trip only the quota, refused separately
+
+  - slug: default-deny-egress-agents
+    statement: Egress out of the agents namespace is default-deny, and a Pod without the egress label cannot reach Google APIs.
+    proof: k8-lab worklog/phase-15-scc-triage.md#the-identity-and-the-label-that-gates-it, an otherwise identical Pod refused
+
+  - slug: workload-identity-no-keys
+    statement: The triage worker federates to k8-lab-triage through Workload Identity and holds no service account key.
+    proof: k8-lab worklog/phase-15-scc-triage.md#the-identity-and-the-label-that-gates-it, the Pod federates and the user-managed key list is empty
+
+  - slug: subscription-scoped-pull
+    statement: The worker identity may pull the scc-triage subscription and nothing else on it, scoped to the subscription rather than to the project.
+    proof: k8-lab worklog/phase-15-scc-triage.md#the-grant-is-scoped-to-the-verb-not-the-resource, :pull returns 200 and get returns 403
+
+  - slug: ledger-append-only
+    statement: Every verdict ledger object is written with a create-only precondition, so no record is overwritten or erased.
+    proof: k8-lab decisions.md#triage-idempotency, and the create-only write path in this repository
+
+  - slug: dead-letter-parking
+    statement: A finding nobody acknowledges is republished to a dead letter topic after five delivery attempts, with its body intact.
+    proof: k8-lab worklog/phase-15-scc-triage.md#a-message-nobody-acknowledges-is-parked-not-lost
+
+  - slug: pod-security-baseline-demo
+    statement: The demo namespace enforces the Pod Security baseline standard and audits against restricted, so a privileged Pod is refused there too.
+    proof: k8-lab worklog/phase-04-workload-guardrails.md
+
+  - slug: no-service-account-token-demo
+    statement: Workloads in the demo namespace mount no service account token, so a compromised Pod holds no cluster credential to present.
+    proof: k8-lab worklog/phase-04-workload-guardrails.md
+
+  - slug: network-policy-default-deny-demo
+    statement: The demo namespace denies traffic by default in both directions, and an unlabelled client is refused by name and by address.
+    proof: k8-lab worklog/phase-04-workload-guardrails.md
+
+  - slug: federation-scoped-to-ref
+    statement: The GitHub Actions federation condition binds both the repository and refs/heads/main, so a dispatch from another branch is rejected before it reaches Google Cloud.
+    proof: k8-lab worklog/phase-14-close-the-baseline.md, both directions measured
+
+  - slug: tls-floor-and-rate-limit
+    statement: The public endpoint refuses TLS 1.0 and 1.1 and throttles one address to 300 requests a minute, measured under a flood.
+    proof: k8-lab worklog/phase-14-close-the-baseline.md, 593 of 1200 requests refused with 429

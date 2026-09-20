@@ -1,0 +1,88 @@
+# One Security Command Center category to zero or more corpus entries, written by hand.
+#
+# Resolution matches category and resource together, exactly. Every pairing below was checked
+# against the check's own source rather than against its name: a first pass paired
+# CLUSTER_SECRETS_ENCRYPTION_DISABLED with CKV_GCP_65 and INTRANODE_VISIBILITY_DISABLED with
+# CKV_GCP_61 on the strength of the names, and both were wrong. CKV_GCP_65 is
+# GKEKubernetesRBACGoogleGroups and CKV_GCP_61 is GKEEnableVPCFlowLogs.
+#
+# Resource names were read from the live findings on 2026-09-20, not constructed. Note that the
+# same cluster arrives under two spellings: Security Health Analytics writes .../zones/... and
+# Event Threat Detection writes .../locations/.... Exact matching is what makes that visible.
+#
+# A category mapped to [] was reviewed and deliberately left unpriced. It resolves to nothing and
+# the worker returns new, which notifies. That is the intended direction: a finding nothing here
+# prices should reach a human, not be settled quietly.
+
+mapping:
+  # Verified: GKEMasterAuthorizedNetworksEnabled.py declares CKV_GCP_20.
+  MASTER_AUTHORIZED_NETWORKS_DISABLED:
+    - resource: //container.googleapis.com/projects/project-69726555-c4de-48de-a69/zones/europe-north1-a/clusters/k8-lab
+      cite:
+        - checkov:CKV_GCP_20:module.gke.google_container_cluster.main
+      why: The control plane endpoint is DNS-only with no authorized network list, and the check against the same cluster resource is already in the baseline.
+
+  # Verified: GKEBinaryAuthorization.py declares CKV_GCP_66. Threat model finding 10 accepts the
+  # same gap from the other direction, arrived at independently by a tool that never read the model.
+  BINARY_AUTHORIZATION_DISABLED:
+    - resource: //container.googleapis.com/projects/project-69726555-c4de-48de-a69/zones/europe-north1-a/clusters/k8-lab
+      cite:
+        - checkov:CKV_GCP_66:module.gke.google_container_cluster.main
+        - threat:10
+      why: No admission policy is enforced on this cluster, priced in the baseline and accepted for now as threat model finding 10.
+
+  # The finding Phase 15's own apply produced, five seconds after Terraform created the bucket,
+  # against a check already in the baseline for the same resource.
+  BUCKET_LOGGING_DISABLED:
+    - resource: //storage.googleapis.com/k8-lab-verdicts-project-69726555-c4de-48de-a69
+      cite:
+        - checkov:CKV_GCP_62:module.findings.google_storage_bucket.ledger
+      why: The verdict ledger bucket has no access logging, and CKV_GCP_62 accepts exactly that on exactly this bucket.
+
+  # The two forwarding rules are the demo Gateway's, and publishing these services is the decision
+  # rather than an oversight. The suffix on each name is generated, so recreating the Gateway stops
+  # these resolving and the findings return as new. That is a re-review, which is the right outcome.
+  EXTERNALLY_EXPOSED_SERVICE_VIA_LOAD_BALANCER:
+    - resource: //compute.googleapis.com/projects/project-69726555-c4de-48de-a69/global/forwardingRules/gkegw1-zs1b-demo-external-ilvdl48uws6q
+      cite:
+        - decision:ingress-mechanism
+      why: This forwarding rule belongs to the demo Gateway on gke-l7-global-external-managed, which exists to publish the demo externally.
+    - resource: //compute.googleapis.com/projects/project-69726555-c4de-48de-a69/global/forwardingRules/gkegw1-zs1b-demo-external-z9h90hrf7gt8
+      cite:
+        - decision:ingress-mechanism
+      why: The second forwarding rule of the same Gateway, publishing the same demo on the other protocol.
+
+  # Reviewed, unpriced. CKV_GCP_65 is RBAC Google Groups and does not describe this. No decision
+  # in the repository prices application-layer Secret encryption either.
+  CLUSTER_SECRETS_ENCRYPTION_DISABLED: []
+
+  # Reviewed, unpriced. CKV_GCP_61 is VPC flow logs and does not describe this.
+  INTRANODE_VISIBILITY_DISABLED: []
+
+  # Reviewed, unpriced. Nothing in the baseline or the threat model covers project-level IAM
+  # membership, and the permission boundary denies broad project roles rather than accepting them.
+  PRIMITIVE_ROLES_USED: []
+  NON_ORG_IAM_MEMBER: []
+
+  # Reviewed, deliberately unpriced, and this one is load-bearing.
+  #
+  # The drill that produced this finding was refused by Pod Security, and nothing in the finding
+  # body says so: the detector fires on the API request, not on a running container. The corpus
+  # carries control:pod-security-restricted-agents as the fact that would settle it, but
+  # deterministic resolution cannot tell that drill from a real privilege escalation in another
+  # namespace. Pairing this category with that control would auto-accept both. It stays unpriced
+  # until Increment 2 can reason from the control instead of matching on it.
+  "Privilege Escalation: Launch of privileged Kubernetes container": []
+
+  # Reviewed, unpriced. The principal was Container Threat Detection's own agent installing itself,
+  # which is recorded in the Phase 14 worklog and nowhere that a verdict may cite.
+  "Persistence: Service Account Created in sensitive namespace": []
+
+  # Reviewed, unpriced. These four name loadgen resources in europe-west4 that were deleted, so the
+  # findings are INACTIVE. The cost posture decision covers deleting the load generator; it does not
+  # price flow logs, firewall logging, private access or a public address, and pairing them with it
+  # would be the name-driven match this file exists to avoid.
+  FLOW_LOGS_DISABLED: []
+  FIREWALL_RULE_LOGGING_DISABLED: []
+  PRIVATE_GOOGLE_ACCESS_DISABLED: []
+  PUBLIC_IP_ADDRESS: []

@@ -1,0 +1,152 @@
+// Command triage-worker pulls Security Command Center findings and settles them against the corpus.
+//
+// Increment 1 calls no model, so the whole path is proven before a single token is spent. It runs as
+// one replica in the agents namespace, pulling continuously, and holds four grants: consume on one
+// subscription, object create and read on the ledger bucket, invoke on Vertex AI, and write on its
+// own log. It holds no Security Command Center permission and no cluster credential.
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"cloud.google.com/go/pubsub/v2"
+
+	"github.com/sindredg/ai-k8s/internal/corpus"
+	"github.com/sindredg/ai-k8s/internal/gcp"
+	"github.com/sindredg/ai-k8s/internal/ledger"
+	"github.com/sindredg/ai-k8s/internal/notify"
+	"github.com/sindredg/ai-k8s/internal/verdict"
+	"github.com/sindredg/ai-k8s/internal/worker"
+)
+
+func main() {
+	corpusPath := flag.String("corpus", "/corpus/corpus.json", "the index corpusc compiled into the image")
+	subscription := flag.String("subscription", "scc-triage", "the one subscription this identity may pull")
+	bucket := flag.String("ledger-bucket", "", "the verdict ledger bucket")
+	reportEvery := flag.Duration("report-every", 5*time.Minute, "how often to log the counters")
+	flag.Parse()
+
+	log := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	slog.SetDefault(log)
+
+	if err := run(*corpusPath, *subscription, *bucket, *reportEvery, log); err != nil {
+		log.Error("the worker stopped", "error", err)
+		os.Exit(1)
+	}
+}
+
+func run(corpusPath, subscription, bucketName string, reportEvery time.Duration, log *slog.Logger) error {
+	// Refuse at startup rather than emitting entries the alert policy silently does not match.
+	pod, err := notify.PodIdentityFrom(os.Getenv)
+	if err != nil {
+		return err
+	}
+	if bucketName == "" {
+		return errors.New("-ledger-bucket is required")
+	}
+
+	index, err := loadCorpus(corpusPath)
+	if err != nil {
+		return err
+	}
+	log.Info("corpus loaded", "entries", len(index.Entries), "categories", len(index.Mapping), "path", corpusPath)
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	bucket, closeBucket, err := gcp.NewBucket(ctx, bucketName)
+	if err != nil {
+		return err
+	}
+	defer closeBucket()
+
+	verdictLog, closeLog, err := gcp.NewVerdictLog(ctx, pod.ProjectID, pod)
+	if err != nil {
+		return err
+	}
+	defer closeLog()
+
+	w := &worker.Worker{
+		Index:      index,
+		Ledger:     ledger.New(bucket),
+		Notifier:   verdictLog,
+		Provenance: provenance(),
+		Log:        log,
+	}
+
+	client, err := pubsub.NewClient(ctx, pod.ProjectID)
+	if err != nil {
+		return fmt.Errorf("open pub/sub: %w", err)
+	}
+	defer client.Close()
+
+	// One replica, one message at a time. Throughput is not the constraint here; a model call will be.
+	sub := client.Subscriber(subscription)
+	sub.ReceiveSettings.NumGoroutines = 1
+	sub.ReceiveSettings.MaxOutstandingMessages = 1
+
+	go report(ctx, w, reportEvery, log)
+
+	log.Info("pulling", "subscription", subscription, "bucket", bucketName, "namespace", pod.Namespace, "pod", pod.PodName)
+	if err := sub.Receive(ctx, func(ctx context.Context, m *pubsub.Message) {
+		w.Handle(ctx, message{m})
+	}); err != nil && ctx.Err() == nil {
+		return fmt.Errorf("receive: %w", err)
+	}
+
+	counts, _ := json.Marshal(w.Counters.Snapshot())
+	log.Info("stopped", "counts", json.RawMessage(counts))
+	return nil
+}
+
+// loadCorpus reads the index the build compiled. Nothing here reads a corpus source at runtime.
+func loadCorpus(path string) (*corpus.Index, error) {
+	body, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read the compiled corpus: %w", err)
+	}
+	return corpus.Unmarshal(body)
+}
+
+// provenance is stamped into the image at build time, so a verdict names the tree it came from.
+func provenance() verdict.Provenance {
+	return verdict.Provenance{
+		CorpusCommit: os.Getenv("CORPUS_COMMIT"),
+		AgentCommit:  os.Getenv("AGENT_COMMIT"),
+		ImageDigest:  os.Getenv("IMAGE_DIGEST"),
+	}
+}
+
+// report publishes the counters periodically. The rules-settled number is the one Phase 15 publishes.
+func report(ctx context.Context, w *worker.Worker, every time.Duration, log *slog.Logger) {
+	ticker := time.NewTicker(every)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			counts, err := json.Marshal(w.Counters.Snapshot())
+			if err != nil {
+				continue
+			}
+			log.Info("counters", "counts", json.RawMessage(counts))
+		}
+	}
+}
+
+// message adapts a Pub/Sub message to the worker's two outcomes.
+type message struct{ m *pubsub.Message }
+
+func (m message) Body() []byte { return m.m.Data }
+func (m message) Ack()         { m.m.Ack() }
+func (m message) Nack()        { m.m.Nack() }
