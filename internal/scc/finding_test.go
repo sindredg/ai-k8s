@@ -192,3 +192,32 @@ func TestInScopeIsEverythingExceptVulnerability(t *testing.T) {
 		t.Error("InScope(VULNERABILITY) = true; Phase 15 records the volume and does not triage it")
 	}
 }
+
+func TestParseReturnsThePartialFindingAlongsideTheError(t *testing.T) {
+	// A finding missing one field can still be keyed and recorded as insufficient_evidence.
+	// Discarding it here would send it to the dead letter topic instead, where nothing rules on it.
+	body := strings.Replace(realEnvelope, `"findingClass"`, `"removedClass"`, 1)
+	env, err := Parse([]byte(body))
+	if err == nil {
+		t.Fatal("Parse accepted a finding with no findingClass")
+	}
+	if env == nil {
+		t.Fatal("Parse returned no envelope, so the finding cannot be keyed or recorded")
+	}
+	if env.Finding.CanonicalName == "" {
+		t.Error("the partial envelope carries no canonical name")
+	}
+	if env.Digest == "" {
+		t.Error("the partial envelope carries no digest, so drift on it could not be detected")
+	}
+}
+
+func TestParseReturnsNoEnvelopeWhenTheBodyIsNotJSON(t *testing.T) {
+	env, err := Parse([]byte("{not json"))
+	if err == nil {
+		t.Fatal("Parse accepted malformed JSON")
+	}
+	if env != nil {
+		t.Error("Parse returned an envelope for a body it could not read at all")
+	}
+}

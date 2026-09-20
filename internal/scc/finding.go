@@ -45,11 +45,23 @@ type Envelope struct {
 // severityUnspecified is what Security Command Center itself calls an unrated finding.
 const severityUnspecified = "SEVERITY_UNSPECIFIED"
 
-// Parse reads one message body. A missing required field is an error, which the worker records as insufficient evidence rather than guessing.
+// Parse reads one message body. A missing required field is an error, and the partial envelope comes
+// back with it: a finding that can still be keyed is recorded as insufficient_evidence rather than
+// discarded, which would send it to the dead letter topic where nothing rules on it.
 func Parse(body []byte) (*Envelope, error) {
 	var env Envelope
 	if err := json.Unmarshal(body, &env); err != nil {
 		return nil, fmt.Errorf("parse finding notification: %w", err)
+	}
+
+	digest, err := digestOf(body)
+	if err != nil {
+		return nil, err
+	}
+	env.Digest = digest
+
+	if strings.TrimSpace(env.Finding.Severity) == "" {
+		env.Finding.Severity = severityUnspecified
 	}
 
 	required := []struct{ field, value string }{
@@ -67,18 +79,8 @@ func Parse(body []byte) (*Envelope, error) {
 		}
 	}
 	if len(missing) > 0 {
-		return nil, fmt.Errorf("finding is missing required fields: %s", strings.Join(missing, ", "))
+		return &env, fmt.Errorf("finding is missing required fields: %s", strings.Join(missing, ", "))
 	}
-
-	if strings.TrimSpace(env.Finding.Severity) == "" {
-		env.Finding.Severity = severityUnspecified
-	}
-
-	digest, err := digestOf(body)
-	if err != nil {
-		return nil, err
-	}
-	env.Digest = digest
 	return &env, nil
 }
 
