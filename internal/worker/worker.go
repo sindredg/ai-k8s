@@ -41,6 +41,12 @@ type Worker struct {
 	Provenance verdict.Provenance
 	Log        *slog.Logger
 	Counters   Counters
+
+	// CrashAt names the boundary a drill stops the worker at. Empty everywhere but a drill.
+	CrashAt ledger.State
+
+	// Exit is os.Exit unless a test replaces it. Nothing in production sets it.
+	Exit func(int)
 }
 
 func (w *Worker) logger() *slog.Logger {
@@ -98,6 +104,9 @@ func (w *Worker) triage(ctx context.Context, env *scc.Envelope, parseErr error, 
 		return err
 	}
 
+	// The verdict is durable and nothing has been notified yet.
+	w.crashIf(ledger.NotificationAttempted)
+
 	if notify.Notifies(record.Verdict) && state.Before(ledger.NotificationAttempted) {
 		if err := w.Ledger.Write(ctx, key, ledger.NotificationAttempted, mustJSON(record)); err != nil && !errors.Is(err, ledger.ErrExists) {
 			return fmt.Errorf("record the notification attempt: %w", err)
@@ -111,6 +120,9 @@ func (w *Worker) triage(ctx context.Context, env *scc.Envelope, parseErr error, 
 		}
 		w.Counters.Add(func(c *Counts) { c.NotificationsSent++ })
 	}
+
+	// The owner has been told and the message is still outstanding.
+	w.crashIf(ledger.Acknowledged)
 
 	m.Ack()
 	if err := w.Ledger.Write(ctx, key, ledger.Acknowledged, mustJSON(record)); err != nil && !errors.Is(err, ledger.ErrExists) {
@@ -166,6 +178,9 @@ func (w *Worker) recordFor(ctx context.Context, key string, state ledger.State, 
 			return verdict.Record{}, fmt.Errorf("even the refusal does not validate: %w", err)
 		}
 	}
+
+	// The finding is settled and nothing is on record yet.
+	w.crashIf(ledger.Received)
 
 	// received is written first, before anything else, so the digest is on record for the next delivery.
 	if !seen {

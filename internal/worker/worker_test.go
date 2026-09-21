@@ -160,6 +160,10 @@ func newTestWorker(t *testing.T) (*Worker, *fakeStore, *fakeNotifier) {
 		Ledger:     ledger.New(store),
 		Notifier:   notifier,
 		Provenance: verdict.Provenance{CorpusCommit: "c", AgentCommit: "a", ImageDigest: "sha256:i"},
+
+		// Every test injects it, so a hook that fires when it should not fails the test that
+		// did not ask for it rather than exiting the test binary.
+		Exit: func(code int) { panic(crashSentinel{code}) },
 	}
 	return w, store, notifier
 }
@@ -425,5 +429,130 @@ func TestAFindingCarryingAnInstructionIsTriagedTheSameAsOneWithout(t *testing.T)
 	}
 	if len(notifier.emitted[1].Citations) != 0 {
 		t.Errorf("the injected finding produced %d citations", len(notifier.emitted[1].Citations))
+	}
+}
+
+// crashSentinel is what the injected Exit panics with, so a test can tell a deliberate crash from
+// a real one. os.Exit does not return, and a test binary that exits proves nothing.
+type crashSentinel struct{ code int }
+
+// runCrashing handles one message and reports whether the worker exited at its boundary.
+func runCrashing(t *testing.T, w *Worker, body []byte) (m *fakeMessage, crashed bool) {
+	t.Helper()
+	m = &fakeMessage{body: body}
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(crashSentinel); !ok {
+				panic(r)
+			}
+			crashed = true
+		}
+	}()
+	w.Handle(context.Background(), m)
+	return m, false
+}
+
+func TestCrashingBeforePersistenceLeavesNothingRecorded(t *testing.T) {
+	w, store, notifier := newTestWorker(t)
+	w.CrashAt = ledger.Received
+
+	m, crashed := runCrashing(t, w, envelope("PRIMITIVE_ROLES_USED", cluster, "MISCONFIGURATION"))
+
+	if !crashed {
+		t.Fatal("the worker did not exit at the received boundary")
+	}
+	if store.has(ledger.Received) {
+		t.Error("the ledger recorded receipt, so the crash landed after persistence")
+	}
+	if len(notifier.emitted) != 0 {
+		t.Errorf("the worker notified %d times before crashing, want 0", len(notifier.emitted))
+	}
+	if m.acked {
+		t.Error("the message was acknowledged")
+	}
+}
+
+func TestCrashingBeforeNotificationKeepsTheVerdict(t *testing.T) {
+	w, store, notifier := newTestWorker(t)
+	w.CrashAt = ledger.NotificationAttempted
+
+	m, crashed := runCrashing(t, w, envelope("PRIMITIVE_ROLES_USED", cluster, "MISCONFIGURATION"))
+
+	if !crashed {
+		t.Fatal("the worker did not exit at the notification_attempted boundary")
+	}
+	if !store.has(ledger.Classified) {
+		t.Error("the verdict was not recorded before the crash")
+	}
+	if store.has(ledger.NotificationAttempted) {
+		t.Error("the notification attempt was recorded, so the crash landed too late")
+	}
+	if len(notifier.emitted) != 0 {
+		t.Errorf("the worker notified %d times, want 0", len(notifier.emitted))
+	}
+	if m.acked {
+		t.Error("the message was acknowledged")
+	}
+}
+
+func TestCrashingBeforeAcknowledgementNotifiesAndRecordsOneAttempt(t *testing.T) {
+	w, store, notifier := newTestWorker(t)
+	w.CrashAt = ledger.Acknowledged
+
+	m, crashed := runCrashing(t, w, envelope("PRIMITIVE_ROLES_USED", cluster, "MISCONFIGURATION"))
+
+	if !crashed {
+		t.Fatal("the worker did not exit at the acknowledged boundary")
+	}
+	if len(notifier.emitted) != 1 {
+		t.Errorf("the worker notified %d times, want 1", len(notifier.emitted))
+	}
+	if store.count(ledger.NotificationAttempted) != 1 {
+		t.Errorf("notification_attempted records = %d, want 1", store.count(ledger.NotificationAttempted))
+	}
+	if m.acked {
+		t.Error("the message was acknowledged despite the crash")
+	}
+	if store.has(ledger.Acknowledged) {
+		t.Error("the ledger recorded acknowledgement")
+	}
+}
+
+func TestTheCrashHookIsOffUnlessTheFlagNamesABoundary(t *testing.T) {
+	w, store, _ := newTestWorker(t)
+
+	m, crashed := runCrashing(t, w, envelope("PRIMITIVE_ROLES_USED", cluster, "MISCONFIGURATION"))
+
+	if crashed {
+		t.Fatal("the worker exited with no boundary set")
+	}
+	if !m.acked {
+		t.Error("the message was not acknowledged")
+	}
+	if !store.has(ledger.Acknowledged) {
+		t.Error("the ledger has no acknowledged record")
+	}
+}
+
+func TestParseCrashAtAcceptsOnlyTheThreeDrillBoundaries(t *testing.T) {
+	for _, want := range []ledger.State{ledger.Received, ledger.NotificationAttempted, ledger.Acknowledged} {
+		got, err := ParseCrashAt(string(want))
+		if err != nil {
+			t.Errorf("ParseCrashAt(%q) returned %v", want, err)
+		}
+		if got != want {
+			t.Errorf("ParseCrashAt(%q) = %q", want, got)
+		}
+	}
+
+	if got, err := ParseCrashAt(""); err != nil || got != "" {
+		t.Errorf(`ParseCrashAt("") = %q, %v, want "", nil`, got, err)
+	}
+
+	// classified is a ledger state but not a drill boundary, so the flag refuses it.
+	for _, bad := range []string{"classified", "nonsense", "RECEIVED"} {
+		if _, err := ParseCrashAt(bad); err == nil {
+			t.Errorf("ParseCrashAt(%q) was accepted", bad)
+		}
 	}
 }
