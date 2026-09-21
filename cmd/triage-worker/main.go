@@ -37,6 +37,7 @@ func main() {
 	reportEvery := flag.Duration("report-every", 5*time.Minute, "how often to log the counters")
 	probeAddr := flag.String("probe-addr", ":8080", "where the kubelet reads /healthz and /readyz")
 	idleLimit := flag.Duration("idle-limit", 24*time.Hour, "report not live after this long with no message; 0 disables it")
+	crashAt := flag.String("crash-at", "", "stop at a drill boundary: received, notification_attempted or acknowledged; empty disables it")
 	flag.Parse()
 
 	log := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}))
@@ -49,6 +50,7 @@ func main() {
 		reportEvery:  *reportEvery,
 		probeAddr:    *probeAddr,
 		idleLimit:    *idleLimit,
+		crashAt:      *crashAt,
 	}, log); err != nil {
 		log.Error("the worker stopped", "error", err)
 		os.Exit(1)
@@ -63,6 +65,7 @@ type settings struct {
 	reportEvery  time.Duration
 	probeAddr    string
 	idleLimit    time.Duration
+	crashAt      string
 }
 
 func run(s settings, log *slog.Logger) error {
@@ -73,6 +76,16 @@ func run(s settings, log *slog.Logger) error {
 	}
 	if s.bucketName == "" {
 		return errors.New("-ledger-bucket is required")
+	}
+
+	// Refuse a boundary that does not exist rather than running a drill that never crashes.
+	crashAt, err := worker.ParseCrashAt(s.crashAt)
+	if err != nil {
+		return err
+	}
+	if crashAt != "" {
+		// A worker left holding the flag stops on the next finding it settles, so say so loudly.
+		log.Warn("the crash drill boundary is set, this worker will stop on purpose", "boundary", crashAt)
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -107,6 +120,7 @@ func run(s settings, log *slog.Logger) error {
 		Notifier:   verdictLog,
 		Provenance: provenance(),
 		Log:        log,
+		CrashAt:    crashAt,
 	}
 
 	client, err := pubsub.NewClient(ctx, pod.ProjectID)
