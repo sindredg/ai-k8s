@@ -25,6 +25,7 @@ import (
 	"github.com/sindredg/ai-k8s/internal/gcp"
 	"github.com/sindredg/ai-k8s/internal/health"
 	"github.com/sindredg/ai-k8s/internal/ledger"
+	"github.com/sindredg/ai-k8s/internal/model"
 	"github.com/sindredg/ai-k8s/internal/notify"
 	"github.com/sindredg/ai-k8s/internal/verdict"
 	"github.com/sindredg/ai-k8s/internal/worker"
@@ -38,6 +39,16 @@ func main() {
 	probeAddr := flag.String("probe-addr", ":8080", "where the kubelet reads /healthz and /readyz")
 	idleLimit := flag.Duration("idle-limit", 24*time.Hour, "report not live after this long with no message; 0 disables it")
 	crashAt := flag.String("crash-at", "", "stop at a drill boundary: received, notification_attempted or acknowledged; empty disables it")
+
+	// Increment 2. Empty -model runs the rules alone.
+	modelID := flag.String("model", "", "the Vertex AI publisher model for unmatched findings; empty disables the model")
+	modelLocation := flag.String("model-location", "europe-north1", "the Vertex AI region the model is called in")
+	modelTimeout := flag.Duration("model-timeout", 30*time.Second, "how long one model call may take before the message goes back unacknowledged")
+	maxInputTokens := flag.Int("max-input-tokens", 16384, "input over this is refused as insufficient_evidence rather than truncated")
+	maxOutputTokens := flag.Int("max-output-tokens", 1024, "the most the model may write; output cut off at this is rejected")
+	ceilingUSD := flag.Float64("daily-spend-ceiling-usd", 1.00, "model spend reserved per UTC day before the model stops being called")
+	priceIn := flag.Float64("price-input-usd-per-mtok", 0.30, "estimated USD per million input tokens")
+	priceOut := flag.Float64("price-output-usd-per-mtok", 2.50, "estimated USD per million output tokens")
 	flag.Parse()
 
 	log := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}))
@@ -51,6 +62,15 @@ func main() {
 		probeAddr:    *probeAddr,
 		idleLimit:    *idleLimit,
 		crashAt:      *crashAt,
+		model: modelSettings{
+			id:              *modelID,
+			location:        *modelLocation,
+			timeout:         *modelTimeout,
+			maxInputTokens:  *maxInputTokens,
+			maxOutputTokens: *maxOutputTokens,
+			ceilingUSD:      *ceilingUSD,
+			prices:          model.Prices{InputPerMillion: *priceIn, OutputPerMillion: *priceOut},
+		},
 	}, log); err != nil {
 		log.Error("the worker stopped", "error", err)
 		os.Exit(1)
@@ -66,6 +86,18 @@ type settings struct {
 	probeAddr    string
 	idleLimit    time.Duration
 	crashAt      string
+	model        modelSettings
+}
+
+// modelSettings configure Increment 2. An empty id leaves the model off.
+type modelSettings struct {
+	id              string
+	location        string
+	timeout         time.Duration
+	maxInputTokens  int
+	maxOutputTokens int
+	ceilingUSD      float64
+	prices          model.Prices
 }
 
 func run(s settings, log *slog.Logger) error {
@@ -121,6 +153,25 @@ func run(s settings, log *slog.Logger) error {
 		Provenance: provenance(),
 		Log:        log,
 		CrashAt:    crashAt,
+	}
+
+	if s.model.id != "" {
+		caller, err := gcp.NewVertex(ctx, pod.ProjectID, s.model.location, s.model.id, s.model.timeout)
+		if err != nil {
+			return err
+		}
+		w.Model = &model.Settler{
+			Caller:         caller,
+			Params:         model.Params{Model: s.model.id, Temperature: 0, MaxOutputTokens: s.model.maxOutputTokens, ThinkingBudget: 0},
+			Index:          index,
+			MaxInputTokens: s.model.maxInputTokens,
+			Prices:         s.model.prices,
+			Spend:          model.NewSpend(bucket, s.model.ceilingUSD, nil),
+		}
+		log.Info("the model settles unmatched findings", "model", s.model.id, "location", s.model.location,
+			"max_input_tokens", s.model.maxInputTokens, "daily_spend_ceiling_usd", s.model.ceilingUSD)
+	} else {
+		log.Info("no model configured, the rules settle every finding")
 	}
 
 	client, err := pubsub.NewClient(ctx, pod.ProjectID)

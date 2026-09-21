@@ -129,12 +129,22 @@ func (r Record) Validate() error {
 	}
 
 	switch r.Verdict {
-	case Accepted, ContradictsDecision:
+	case Accepted:
 		if len(r.Citations) == 0 {
-			problems = append(problems, fmt.Sprintf("%s cites nothing, and it asserts something about a recorded decision", r.Verdict))
+			problems = append(problems, "accepted cites nothing, and it asserts something about a recorded decision")
 		}
 		if r.CorpusMatch != MatchMatched {
-			problems = append(problems, fmt.Sprintf("%s requires corpus_match: matched", r.Verdict))
+			problems = append(problems, "accepted requires corpus_match: matched")
+		}
+		// Acceptance is the quiet path, so only the reviewed mapping may take a finding there.
+		if r.SettledBy == SettledByModel {
+			problems = append(problems, "the model never settles a finding as accepted")
+		}
+	case ContradictsDecision:
+		// corpus_match records what deterministic resolution found. A contradiction the model finds on
+		// an unmatched finding carries none, and stands on its resolved citations instead.
+		if len(r.Citations) == 0 {
+			problems = append(problems, "contradicts_decision cites nothing, and it asserts something about a recorded decision")
 		}
 	case New:
 		if r.CorpusMatch != MatchNone {

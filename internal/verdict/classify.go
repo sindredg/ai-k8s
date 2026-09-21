@@ -49,6 +49,10 @@ func Insufficient(env *scc.Envelope, missing []string, prov Provenance) Record {
 	return r
 }
 
+// Base is the record every verdict starts from, for the model path to fill in. The verdict is unset
+// and fails validation until the caller sets one.
+func Base(env *scc.Envelope, prov Provenance) Record { return baseRecord(env, prov) }
+
 // baseRecord fills what every verdict carries, defaulting the two fields the metric turns into labels.
 func baseRecord(env *scc.Envelope, prov Provenance) Record {
 	f := env.Finding

@@ -41,6 +41,7 @@ func NewVerdictLog(ctx context.Context, projectID string, pod notify.PodIdentity
 func (v *VerdictLog) Emit(_ context.Context, r verdict.Record) error {
 	v.logger.Log(logging.Entry{
 		Severity: severityFor(r.Verdict),
+		Labels:   notify.Labels(r),
 		Payload:  notify.Payload(r),
 	})
 	if err := v.logger.Flush(); err != nil {

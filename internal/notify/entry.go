@@ -54,6 +54,20 @@ func MonitoredResource(p PodIdentity) Resource {
 // Payload is the jsonPayload the metric extracts its labels from.
 func Payload(r verdict.Record) verdict.Record { return r }
 
+// Labels go on the log entry itself, so a run's tokens and cost can be read and summed per finding
+// without parsing the payload. Rules-settled entries carry no model labels.
+func Labels(r verdict.Record) map[string]string {
+	labels := map[string]string{"settled_by": r.SettledBy}
+	if r.Provenance.Model == "" {
+		return labels
+	}
+	labels["model"] = r.Provenance.Model
+	labels["input_tokens"] = fmt.Sprint(r.Provenance.InputTokens)
+	labels["output_tokens"] = fmt.Sprint(r.Provenance.OutputTokens)
+	labels["cost_estimate"] = r.Provenance.CostEstimate
+	return labels
+}
+
 // Notifies reports whether a verdict reaches the owner. Accepted is recorded and stays quiet,
 // which is what the metric filter jsonPayload.verdict != "accepted" already enforces.
 func Notifies(v verdict.Value) bool { return v != verdict.Accepted }

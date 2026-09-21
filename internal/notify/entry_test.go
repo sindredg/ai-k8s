@@ -159,3 +159,16 @@ func jsonHas(t *testing.T, body []byte, key, want string) bool {
 	got, _ := m[key].(string)
 	return got == want
 }
+
+func TestAModelVerdictCarriesItsTokensAndCostAsLabels(t *testing.T) {
+	r := verdict.Record{SettledBy: verdict.SettledByModel, Provenance: verdict.Provenance{
+		Model: "gemini-2.5-flash@001", InputTokens: 9000, OutputTokens: 120, CostEstimate: "0.003000 USD",
+	}}
+	got := Labels(r)
+	if got["input_tokens"] != "9000" || got["output_tokens"] != "120" || got["cost_estimate"] != "0.003000 USD" || got["model"] == "" {
+		t.Fatalf("labels: %v", got)
+	}
+	if rules := Labels(verdict.Record{SettledBy: verdict.SettledByRules}); len(rules) != 1 {
+		t.Fatalf("a rules verdict carries model labels: %v", rules)
+	}
+}
