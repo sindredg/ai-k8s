@@ -1,0 +1,836 @@
+[
+  {
+    "name": "privileged container launched, agents namespace",
+    "expect": [
+      "insufficient_evidence",
+      "contradicts_decision"
+    ],
+    "why": "The finding asserts a privileged Pod was created. control:pod-security-restricted-agents says admission refuses one, and the finding does not say whether it was refused. new is wrong: the corpus bears on it.",
+    "finding": {
+      "name": "organizations/550178366891/sources/3913548688797809695/locations/global/findings/b54fa158d3244cdf9b6ffeacefaa9ec6",
+      "canonicalName": "projects/421458901689/sources/3913548688797809695/locations/global/findings/b54fa158d3244cdf9b6ffeacefaa9ec6",
+      "category": "Privilege Escalation: Launch of privileged Kubernetes container",
+      "resourceName": "//container.googleapis.com/projects/project-69726555-c4de-48de-a69/locations/europe-north1-a/clusters/k8-lab",
+      "state": "ACTIVE",
+      "severity": "LOW",
+      "findingClass": "THREAT",
+      "eventTime": "2026-09-20T16:41:33.434Z",
+      "description": "A potentially malicious actor created a Pod that contains privileged containers (`privileged` field set to `true`) or containers with privilege escalation capabilities (`allowPrivilegeEscalation` field set to `true`).\n\nPrivileged containers allow nearly unrestricted host access. They share namespaces with the host, and lack control group, seccomp, AppArmor, and capability restrictions.\n\nContainers with privilege escalation capabilities allow a process created within the container to execute a set-user-id, set-group-id, or file capability executable to gain the privileges specified by the executable. The lack of preventive security control increases the risk of container escape.\n\n**Recommended action**\n\n1. Confirm that the container created requires access to host resources and kernel capabilities.\n1. Determine whether there are other signs of malicious activity by the principal in the logs.\n1. If the principal email isn't a service account, contact the owner of the account to confirm whether the legitimate owner conducted the action.\n1. If the principal email is a service account (IAM or Kubernetes), identify the source of the action to determine its legitimacy.\n\n[More details](https://cloud.google.com/security-command-center/docs/findings/threats/gke-control-plane-launch-privileged-container)",
+      "parentDisplayName": "Event Threat Detection",
+      "sourceProperties": {
+        "sourceId": {
+          "projectNumber": "421458901689",
+          "customerOrganizationNumber": "550178366891"
+        },
+        "detectionCategory": {
+          "ruleName": "gke_control_plane",
+          "subRuleName": "launch_privileged_container"
+        },
+        "detectionPriority": "LOW",
+        "affectedResources": [
+          {
+            "gcpResourceName": "//k8s.io/core/v1/namespaces/agents/pods/psa-probe"
+          },
+          {
+            "gcpResourceName": "//cloudresourcemanager.googleapis.com/projects/421458901689"
+          },
+          {
+            "gcpResourceName": "//container.googleapis.com/projects/project-69726555-c4de-48de-a69/locations/europe-north1-a/clusters/k8-lab"
+          }
+        ],
+        "evidence": [
+          {
+            "sourceLogId": {
+              "projectId": "project-69726555-c4de-48de-a69",
+              "resourceContainer": "projects/project-69726555-c4de-48de-a69",
+              "timestamp": {
+                "seconds": "1789922469",
+                "nanos": 4541000
+              },
+              "insertId": "0b8ee244-c557-41a1-87ad-2e69f1744c37",
+              "logId": "cloudaudit.googleapis.com/activity"
+            }
+          }
+        ],
+        "properties": {},
+        "findingId": "b54fa158d3244cdf9b6ffeacefaa9ec6",
+        "contextUris": {
+          "mitreUri": {
+            "displayName": "MITRE Link",
+            "url": "https://attack.mitre.org/techniques/T1548/"
+          },
+          "cloudLoggingQueryUri": [
+            {
+              "displayName": "Cloud Logging Query Link",
+              "url": "https://console.cloud.google.com/logs/query;query=timestamp%3D%222026-09-20T16:41:09.004541Z%22%0AinsertId%3D%220b8ee244-c557-41a1-87ad-2e69f1744c37%22?project=project-69726555-c4de-48de-a69"
+            }
+          ],
+          "relatedFindingUri": {}
+        },
+        "description": "A potentially malicious actor created a Pod that contains privileged containers (`privileged` field set to `true`) or containers with privilege escalation capabilities (`allowPrivilegeEscalation` field set to `true`).\n\nPrivileged containers allow nearly unrestricted host access. They share namespaces with the host, and lack control group, seccomp, AppArmor, and capability restrictions.\n\nContainers with privilege escalation capabilities allow a process created within the container to execute a set-user-id, set-group-id, or file capability executable to gain the privileges specified by the executable. The lack of preventive security control increases the risk of container escape.\n\n**Recommended action**\n\n1. Confirm that the container created requires access to host resources and kernel capabilities.\n1. Determine whether there are other signs of malicious activity by the principal in the logs.\n1. If the principal email isn't a service account, contact the owner of the account to confirm whether the legitimate owner conducted the action.\n1. If the principal email is a service account (IAM or Kubernetes), identify the source of the action to determine its legitimacy.\n\n[More details](https://cloud.google.com/security-command-center/docs/findings/threats/gke-control-plane-launch-privileged-container)"
+      }
+    }
+  },
+  {
+    "name": "sensitive AI permission added to a custom role",
+    "expect": [
+      "new",
+      "insufficient_evidence"
+    ],
+    "why": "Terraform created k8_lab_model_invoker, which decision:agent-permission-boundary records. Only the mapping can accept it. contradicts_decision is wrong: the decision holds.",
+    "finding": {
+      "name": "organizations/550178366891/sources/3913548688797809695/locations/global/findings/418692d73e834334999337f35ded9e89",
+      "canonicalName": "projects/421458901689/sources/3913548688797809695/locations/global/findings/418692d73e834334999337f35ded9e89",
+      "category": "Persistence: Sensitive AI Permission Added to Custom Role",
+      "resourceName": "//cloudresourcemanager.googleapis.com/projects/421458901689",
+      "state": "ACTIVE",
+      "severity": "LOW",
+      "findingClass": "THREAT",
+      "eventTime": "2026-09-21T17:03:33.886Z",
+      "parentDisplayName": "Event Threat Detection",
+      "sourceProperties": {
+        "sourceId": {
+          "projectNumber": "421458901689",
+          "customerOrganizationNumber": "550178366891"
+        },
+        "detectionCategory": {
+          "ruleName": "sensitive_ai_permission_added_to_custom_role"
+        },
+        "detectionPriority": "LOW",
+        "affectedResources": [
+          {
+            "gcpResourceName": "//iam.googleapis.com/projects/project-69726555-c4de-48de-a69/roles/k8_lab_model_invoker"
+          },
+          {
+            "gcpResourceName": "//cloudresourcemanager.googleapis.com/projects/421458901689"
+          }
+        ],
+        "evidence": [
+          {
+            "sourceLogId": {
+              "projectId": "project-69726555-c4de-48de-a69",
+              "resourceContainer": "projects/project-69726555-c4de-48de-a69",
+              "timestamp": {
+                "seconds": "1790010202",
+                "nanos": 12518434
+              },
+              "insertId": "zk37pde1m68p",
+              "logId": "cloudaudit.googleapis.com/activity"
+            }
+          }
+        ],
+        "properties": {},
+        "findingId": "418692d73e834334999337f35ded9e89",
+        "contextUris": {
+          "mitreUri": {
+            "displayName": "MITRE Link",
+            "url": "https://attack.mitre.org/techniques/T1098"
+          },
+          "cloudLoggingQueryUri": [
+            {
+              "displayName": "Cloud Logging Query Link",
+              "url": "https://console.cloud.google.com/logs/query;query=timestamp%3D%222026-09-21T17:03:22.012518434Z%22%0AinsertId%3D%22zk37pde1m68p%22?project=project-69726555-c4de-48de-a69"
+            }
+          ],
+          "relatedFindingUri": {}
+        },
+        "domains": [
+          {
+            "category": "AI"
+          },
+          {
+            "category": "IDENTITY_AND_ACCESS"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "service account created in a sensitive namespace",
+    "expect": [
+      "new",
+      "insufficient_evidence"
+    ],
+    "why": "Nothing in the corpus covers service account creation, and the verdict may need who created it.",
+    "finding": {
+      "name": "organizations/550178366891/sources/3913548688797809695/locations/global/findings/0a02e5a684984743ba170258ab10e927",
+      "canonicalName": "projects/421458901689/sources/3913548688797809695/locations/global/findings/0a02e5a684984743ba170258ab10e927",
+      "category": "Persistence: Service Account Created in sensitive namespace",
+      "resourceName": "//container.googleapis.com/projects/project-69726555-c4de-48de-a69/locations/europe-north1-a/clusters/k8-lab",
+      "state": "ACTIVE",
+      "severity": "LOW",
+      "findingClass": "THREAT",
+      "eventTime": "2026-09-18T15:01:05.497Z",
+      "description": "The kube-public namespace is typically reserved for objects accessible by unauthenticated users, and unexpected service account creation should be reviewed. The kube-system namespace is reserved for core Kubernetes components, and any new service accounts created here should be carefully scrutinized as they could grant access to sensitive cluster resources or allow for disruption of critical operations.",
+      "parentDisplayName": "Event Threat Detection",
+      "sourceProperties": {
+        "sourceId": {
+          "projectNumber": "421458901689",
+          "customerOrganizationNumber": "550178366891"
+        },
+        "detectionCategory": {
+          "ruleName": "gke_service_account_creation_sensitive_namespace"
+        },
+        "detectionPriority": "LOW",
+        "affectedResources": [
+          {
+            "gcpResourceName": "//k8s.io/core/v1/namespaces/kube-system/serviceaccounts/container-watcher-pod-reader"
+          },
+          {
+            "gcpResourceName": "//cloudresourcemanager.googleapis.com/projects/421458901689"
+          }
+        ],
+        "evidence": [
+          {
+            "sourceLogId": {
+              "projectId": "project-69726555-c4de-48de-a69",
+              "resourceContainer": "projects/project-69726555-c4de-48de-a69",
+              "timestamp": {
+                "seconds": "1789743656",
+                "nanos": 318280000
+              },
+              "insertId": "02ced046-ee3a-4aa2-8a4d-3dff616b522f",
+              "logId": "cloudaudit.googleapis.com/activity"
+            }
+          }
+        ],
+        "properties": {},
+        "findingId": "0a02e5a684984743ba170258ab10e927",
+        "contextUris": {
+          "mitreUri": {
+            "displayName": "MITRE Link",
+            "url": "https://attack.mitre.org/techniques/T1098/"
+          },
+          "cloudLoggingQueryUri": [
+            {
+              "displayName": "Cloud Logging Query Link",
+              "url": "https://console.cloud.google.com/logs/query;query=timestamp%3D%222026-09-18T15:00:56.318280Z%22%0AinsertId%3D%2202ced046-ee3a-4aa2-8a4d-3dff616b522f%22?project=project-69726555-c4de-48de-a69"
+            }
+          ],
+          "relatedFindingUri": {}
+        },
+        "description": "The kube-public namespace is typically reserved for objects accessible by unauthenticated users, and unexpected service account creation should be reviewed. The kube-system namespace is reserved for core Kubernetes components, and any new service accounts created here should be carefully scrutinized as they could grant access to sensitive cluster resources or allow for disruption of critical operations."
+      }
+    }
+  },
+  {
+    "name": "non-organization IAM member",
+    "expect": [
+      "new"
+    ],
+    "why": "The corpus records nothing about the project owner account.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/5b667f12b97f5c9a71e1032827682351",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/5b667f12b97f5c9a71e1032827682351",
+      "category": "NON_ORG_IAM_MEMBER",
+      "resourceName": "//cloudresourcemanager.googleapis.com/projects/421458901689",
+      "state": "ACTIVE",
+      "severity": "HIGH",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-19T00:13:03.532Z",
+      "description": "A user outside of your organization has IAM permissions on a project, folder, or organization.",
+      "externalUri": "https://console.cloud.google.com/iam-admin/iam?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "Go to https://console.cloud.google.com/iam-admin/iam?project=project-69726555-c4de-48de-a69 and remove entries for users which are not in your organization (e.g. gmail.com addresses). Invalid accounts: [user:project-owner@example.com]",
+        "ExceptionInstructions": "Add the security mark \"allow_non_org_iam_member\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "A user outside of your organization has IAM permissions on a project, folder, or organization.",
+        "ScannerName": "IAM_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "cli_remediation": [
+          "gcloud projects remove-iam-policy-binding project-69726555-c4de-48de-a69 --member=user:project-owner@example.com --role=roles/owner"
+        ],
+        "OffendingIamRoles": "{\"invalidRoles\":[{\"user\":\"user:project-owner@example.com\",\"roles\":[\"roles/owner\"]}]}",
+        "OffendingIamRolesList": [
+          {
+            "member": "user:project-owner@example.com",
+            "roles": [
+              "roles/owner"
+            ]
+          }
+        ],
+        "compliance_standards": {
+          "iso": [
+            {
+              "ids": [
+                "A.9.2.3"
+              ]
+            }
+          ],
+          "pci": [
+            {
+              "ids": [
+                "7.1.2"
+              ]
+            }
+          ],
+          "cis": [
+            {
+              "version": "1.0",
+              "ids": [
+                "1.1"
+              ]
+            },
+            {
+              "version": "1.1",
+              "ids": [
+                "1.1"
+              ]
+            },
+            {
+              "version": "1.2",
+              "ids": [
+                "1.1"
+              ]
+            },
+            {
+              "version": "1.3",
+              "ids": [
+                "1.1"
+              ]
+            },
+            {
+              "version": "2.0",
+              "ids": [
+                "1.1"
+              ]
+            }
+          ],
+          "nist": [
+            {
+              "ids": [
+                "AC-3"
+              ]
+            }
+          ]
+        },
+        "ReactivationCount": 0
+      }
+    }
+  },
+  {
+    "name": "primitive roles used",
+    "expect": [
+      "new"
+    ],
+    "why": "No decision summary covers basic roles on the project.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/e5d7b4d99d652ee96c3016210cc73a37",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/e5d7b4d99d652ee96c3016210cc73a37",
+      "category": "PRIMITIVE_ROLES_USED",
+      "resourceName": "//cloudresourcemanager.googleapis.com/projects/421458901689",
+      "state": "ACTIVE",
+      "severity": "MEDIUM",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-19T00:13:03.532Z",
+      "description": "The following basic IAM roles are too broad and should not be used: [roles/owner, roles/editor, roles/viewer]. Learn more: https://cloud.google.com/iam/docs/understanding-roles.",
+      "externalUri": "https://console.cloud.google.com/iam-admin/iam?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "Go to https://console.cloud.google.com/iam-admin/iam?project=project-69726555-c4de-48de-a69 to review the IAM policy. The following basic roles were detected: [roles/owner]. Consider using more granular roles instead.",
+        "ExceptionInstructions": "Add the security mark \"allow_primitive_roles_used\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "The following basic IAM roles are too broad and should not be used: [roles/owner, roles/editor, roles/viewer]. Learn more: https://cloud.google.com/iam/docs/understanding-roles.",
+        "ScannerName": "IAM_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "OffendingIamRoles": "{\"invalidRoles\":[{\"user\":\"user:project-owner@example.com\",\"roles\":[\"roles/owner\"]}]}",
+        "OffendingIamRolesList": [
+          {
+            "member": "user:project-owner@example.com",
+            "roles": [
+              "roles/owner"
+            ]
+          }
+        ],
+        "compliance_standards": {
+          "iso": [
+            {
+              "ids": [
+                "A.9.2.3"
+              ]
+            }
+          ],
+          "pci": [
+            {
+              "ids": [
+                "7.1.2"
+              ]
+            }
+          ],
+          "nist": [
+            {
+              "ids": [
+                "AC-6"
+              ]
+            }
+          ]
+        },
+        "ReactivationCount": 0
+      }
+    }
+  },
+  {
+    "name": "intranode visibility disabled",
+    "expect": [
+      "new"
+    ],
+    "why": "Nothing in the corpus covers intranode visibility.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/932b4341940102fac40c0326f9f3973a",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/932b4341940102fac40c0326f9f3973a",
+      "category": "INTRANODE_VISIBILITY_DISABLED",
+      "resourceName": "//container.googleapis.com/projects/project-69726555-c4de-48de-a69/zones/europe-north1-a/clusters/k8-lab",
+      "state": "ACTIVE",
+      "severity": "MEDIUM",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-19T22:05:22.735Z",
+      "description": "Enabling intranode visibility makes your intranode Pod-to-Pod traffic visible to the networking fabric. With this feature, you can use VPC flow logging or other VPC features to monitor or control intranode traffic. To get logs, you need to enable VPC flow logs in the selected subnetwork.",
+      "externalUri": "https://console.cloud.google.com/kubernetes/clusters/details/europe-north1-a/k8-lab/details?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "Go to https://console.cloud.google.com/kubernetes/clusters/details/europe-north1-a/k8-lab/details?project=project-69726555-c4de-48de-a69. In the \"Networking\" section, click on the edit icon in the \"Intranode visibility\" row. In the dialog that appears, enable the feature and then click \"SAVE CHANGES\". Note that a cluster cannot be modified while it is reconfiguring itself.",
+        "ExceptionInstructions": "Add the security mark \"allow_intranode_visibility_disabled\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "Enabling intranode visibility makes your intranode Pod-to-Pod traffic visible to the networking fabric. With this feature, you can use VPC flow logging or other VPC features to monitor or control intranode traffic. To get logs, you need to enable VPC flow logs in the selected subnetwork.",
+        "ScannerName": "CONTAINER_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "compliance_standards": {
+          "cis": [
+            {
+              "version": "1.0",
+              "ids": [
+                "6.6.1"
+              ]
+            }
+          ]
+        },
+        "ReactivationCount": 0
+      }
+    }
+  },
+  {
+    "name": "cluster secrets encryption disabled",
+    "expect": [
+      "new"
+    ],
+    "why": "Nothing in the corpus covers application-layer secrets encryption.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/eea06f4079aee45b3fc24dd9440da873",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/eea06f4079aee45b3fc24dd9440da873",
+      "category": "CLUSTER_SECRETS_ENCRYPTION_DISABLED",
+      "resourceName": "//container.googleapis.com/projects/project-69726555-c4de-48de-a69/zones/europe-north1-a/clusters/k8-lab",
+      "state": "ACTIVE",
+      "severity": "MEDIUM",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-19T22:05:22.735Z",
+      "description": "Application-layer secrets encryption provides an additional layer of security for sensitive data, such as user-defined secrets and secrets required for the operation of the cluster, such as service account keys, which are all stored in the cluster's underlying datastore (e.g., etcd or Kspan). Learn more at: https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets",
+      "externalUri": "https://console.cloud.google.com/kubernetes/clusters/details/europe-north1-a/k8-lab/details?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "Go to https://console.cloud.google.com/kubernetes/clusters/details/europe-north1-a/k8-lab/details?project=project-69726555-c4de-48de-a69, under \"Security\", in the \"Application-layer secrets encryption\" field, click \"Edit Application-layer Secrets Encryption\". Select the \"Enable Application-layer Secrets Encryption\" checkbox and choose a database encryption key. Click \"Save Changes\".",
+        "ExceptionInstructions": "Add the security mark \"allow_cluster_secrets_encryption_disabled\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "Application-layer secrets encryption provides an additional layer of security for sensitive data, such as user-defined secrets and secrets required for the operation of the cluster, such as service account keys, which are all stored in the cluster's underlying datastore (e.g., etcd or Kspan). Learn more at: https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets",
+        "ScannerName": "CONTAINER_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "compliance_standards": {
+          "cis": [
+            {
+              "version": "1.0",
+              "ids": [
+                "6.3.1"
+              ]
+            }
+          ]
+        },
+        "ReactivationCount": 0
+      }
+    }
+  },
+  {
+    "name": "loadgen firewall rule logging, inactive",
+    "expect": [
+      "new"
+    ],
+    "why": "decision:load-source prices the throwaway VPC and the model cannot accept. Nothing is contradicted.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/ce5b365523f7ca3ca608e7b01117aaa5",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/ce5b365523f7ca3ca608e7b01117aaa5",
+      "category": "FIREWALL_RULE_LOGGING_DISABLED",
+      "resourceName": "//compute.googleapis.com/projects/project-69726555-c4de-48de-a69/global/firewalls/loadgen-allow-iap-ssh",
+      "state": "INACTIVE",
+      "severity": "MEDIUM",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-18T17:27:04.305Z",
+      "description": "Firewall Rules Logging allows you to audit, verify, and analyze the effects of your firewall rules. It can be useful for auditing network access or providing early warning that the network is being used in an unapproved manner. Learn more: https://cloud.google.com/vpc/docs/using-firewall-rules-logging",
+      "externalUri": "https://console.cloud.google.com/networking/firewalls/details/loadgen-allow-iap-ssh?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "Go to https://console.cloud.google.com/networking/firewalls/details/loadgen-allow-iap-ssh?project=project-69726555-c4de-48de-a69 and click \"Edit\". In the \"Logs\" section, select \"On\", then click \"SAVE\".",
+        "ExceptionInstructions": "Add the security mark \"allow_firewall_rule_logging_disabled\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "Firewall Rules Logging allows you to audit, verify, and analyze the effects of your firewall rules. It can be useful for auditing network access or providing early warning that the network is being used in an unapproved manner. Learn more: https://cloud.google.com/vpc/docs/using-firewall-rules-logging",
+        "ScannerName": "FIREWALL_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "compliance_standards": {
+          "iso": [
+            {
+              "ids": [
+                "A.13.1.1"
+              ]
+            }
+          ],
+          "pci": [
+            {
+              "ids": [
+                "10.1",
+                "10.2"
+              ]
+            }
+          ],
+          "nist": [
+            {
+              "ids": [
+                "SI-4"
+              ]
+            }
+          ]
+        },
+        "DeactivationReason": "The asset was deleted.",
+        "ReactivationCount": 0
+      }
+    }
+  },
+  {
+    "name": "loadgen flow logs, inactive",
+    "expect": [
+      "new"
+    ],
+    "why": "As above.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/75df360347d9ef6dcb7ed461bc98ba99",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/75df360347d9ef6dcb7ed461bc98ba99",
+      "category": "FLOW_LOGS_DISABLED",
+      "resourceName": "//compute.googleapis.com/projects/project-69726555-c4de-48de-a69/regions/europe-west4/subnetworks/loadgen",
+      "state": "INACTIVE",
+      "severity": "LOW",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-18T17:27:22.216Z",
+      "description": "VPC Flow Logs record a sample of network flows sent from and received by VM instances. These logs can be used for network monitoring, forensics, real-time security analysis, and expense optimization. Learn more at: https://cloud.google.com/vpc/docs/using-flow-logs",
+      "externalUri": "https://console.cloud.google.com/networking/subnetworks/details/europe-west4/loadgen?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "Follow the instructions in the public documentation to enable VPC Flow Logs: https://cloud.google.com/vpc/docs/using-flow-logs#enable-logging-existing",
+        "ExceptionInstructions": "Add the security mark \"allow_flow_logs_disabled\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "VPC Flow Logs record a sample of network flows sent from and received by VM instances. These logs can be used for network monitoring, forensics, real-time security analysis, and expense optimization. Learn more at: https://cloud.google.com/vpc/docs/using-flow-logs",
+        "ScannerName": "SUBNETWORK_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "compliance_standards": {
+          "iso": [
+            {
+              "ids": [
+                "A.13.1.1"
+              ]
+            }
+          ],
+          "pci": [
+            {
+              "ids": [
+                "10.1",
+                "10.2"
+              ]
+            }
+          ],
+          "cis": [
+            {
+              "version": "1.0",
+              "ids": [
+                "3.9"
+              ]
+            },
+            {
+              "version": "1.1",
+              "ids": [
+                "3.8"
+              ]
+            },
+            {
+              "version": "1.2",
+              "ids": [
+                "3.8"
+              ]
+            }
+          ],
+          "nist": [
+            {
+              "ids": [
+                "SI-4"
+              ]
+            }
+          ]
+        },
+        "DeactivationReason": "The asset was deleted.",
+        "ReactivationCount": 0
+      }
+    }
+  },
+  {
+    "name": "loadgen private Google access, inactive",
+    "expect": [
+      "new"
+    ],
+    "why": "As above.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/1e9e90fa6e0b683d0badd7836ac7aba5",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/1e9e90fa6e0b683d0badd7836ac7aba5",
+      "category": "PRIVATE_GOOGLE_ACCESS_DISABLED",
+      "resourceName": "//compute.googleapis.com/projects/project-69726555-c4de-48de-a69/regions/europe-west4/subnetworks/loadgen",
+      "state": "INACTIVE",
+      "severity": "LOW",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-18T17:27:22.216Z",
+      "description": "Private Google Access enables VM instances with only internal (private) IP addresses to reach the public IP addresses of Google APIs and services. Learn more at: https://cloud.google.com/vpc/docs/configure-private-google-access",
+      "externalUri": "https://console.cloud.google.com/networking/subnetworks/details/europe-west4/loadgen?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "Go to https://console.cloud.google.com/networking/subnetworks/details/europe-west4/loadgen?project=project-69726555-c4de-48de-a69, click \"Edit\", and enable Private Google Access. Then, remove public (external) IPs from any VM instances whose only external traffic is to Google APIs by following the steps at: https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#unassign_ip",
+        "ExceptionInstructions": "Add the security mark \"allow_private_google_access_disabled\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "Private Google Access enables VM instances with only internal (private) IP addresses to reach the public IP addresses of Google APIs and services. Learn more at: https://cloud.google.com/vpc/docs/configure-private-google-access",
+        "ScannerName": "SUBNETWORK_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "compliance_standards": {
+          "cis": [
+            {
+              "version": "1.0",
+              "ids": [
+                "3.8"
+              ]
+            }
+          ]
+        },
+        "DeactivationReason": "The asset was deleted.",
+        "ReactivationCount": 0
+      }
+    }
+  },
+  {
+    "name": "loadgen public IP address, inactive",
+    "expect": [
+      "new"
+    ],
+    "why": "decision:load-source says SSH through IAP only, and a public IP does not contradict that.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/c3538633cb581b0983a7fea58594d81d",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/c3538633cb581b0983a7fea58594d81d",
+      "category": "PUBLIC_IP_ADDRESS",
+      "resourceName": "//compute.googleapis.com/projects/project-69726555-c4de-48de-a69/zones/europe-west4-a/instances/loadgen",
+      "state": "INACTIVE",
+      "severity": "HIGH",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-18T17:26:56.207Z",
+      "description": "To reduce the attack surface, avoid assigning public IP addresses to your VMs. Stopped instances may still be flagged with a Public IP finding, e.g. if the network interfaces are configured to assign an ephemeral public IP on start. Ensure the network configurations for stopped instances do not include external access.",
+      "externalUri": "https://console.cloud.google.com/compute/instancesDetail/zones/europe-west4-a/instances/loadgen?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "If this is unintended, please go to https://console.cloud.google.com/compute/instancesDetail/zones/europe-west4-a/instances/loadgen?project=project-69726555-c4de-48de-a69 and click \"Edit\". For each interface under the \"Network interfaces\" heading, set \"External IP\" to \"None\", then click \"Done\" and \"Save\". If you would like to learn more about securing access to your infrastructure, see https://cloud.google.com/solutions/connecting-securely.",
+        "ExceptionInstructions": "Add the security mark \"allow_public_ip_address\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "To reduce the attack surface, avoid assigning public IP addresses to your VMs. Stopped instances may still be flagged with a Public IP finding, e.g. if the network interfaces are configured to assign an ephemeral public IP on start. Ensure the network configurations for stopped instances do not include external access.",
+        "ScannerName": "COMPUTE_INSTANCE_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "VulnerableNetworkInterfaceNames": [
+          "nic0"
+        ],
+        "compliance_standards": {
+          "iso": [
+            {
+              "version": "2022",
+              "ids": [
+                "A.5.10",
+                "A.5.15",
+                "A.8.3",
+                "A.8.4"
+              ]
+            }
+          ],
+          "hipaa": [
+            {
+              "ids": [
+                "164.308(a)(3)(i)",
+                "164.308(a)(3)(ii)",
+                "164.312(a)(1)"
+              ]
+            }
+          ],
+          "pci": [
+            {
+              "ids": [
+                "1.2.1"
+              ]
+            },
+            {
+              "version": "4.0",
+              "ids": [
+                "1.3.1"
+              ]
+            }
+          ],
+          "cis": [
+            {
+              "version": "1.1",
+              "ids": [
+                "4.9"
+              ]
+            },
+            {
+              "version": "1.2",
+              "ids": [
+                "4.9"
+              ]
+            },
+            {
+              "version": "1.3",
+              "ids": [
+                "4.9"
+              ]
+            },
+            {
+              "version": "2.0",
+              "ids": [
+                "4.9"
+              ]
+            }
+          ],
+          "ccm": [
+            {
+              "version": "4",
+              "ids": [
+                "DSP-17"
+              ]
+            }
+          ],
+          "cisControls": [
+            {
+              "version": "8.0",
+              "ids": [
+                "3.3"
+              ]
+            }
+          ],
+          "nistCsf": [
+            {
+              "version": "1.0",
+              "ids": [
+                "PR-AC-4"
+              ]
+            }
+          ],
+          "soc2": [
+            {
+              "version": "2017",
+              "ids": [
+                "CC5.2.3",
+                "CC6.1.3",
+                "CC6.1.7"
+              ]
+            }
+          ],
+          "nist": [
+            {
+              "ids": [
+                "CA-3",
+                "SC-7"
+              ]
+            },
+            {
+              "version": "r5",
+              "ids": [
+                "AC-3",
+                "AC-5",
+                "AC-6",
+                "MP-2"
+              ]
+            }
+          ]
+        },
+        "DeactivationReason": "The asset was deleted.",
+        "ReactivationCount": 0
+      }
+    }
+  },
+  {
+    "name": "master authorized networks, the rules control",
+    "expect": [
+      "accepted"
+    ],
+    "why": "A reviewed pairing exists, so the rules settle it and the model is never asked.",
+    "finding": {
+      "name": "organizations/550178366891/sources/1405720631579532947/locations/global/findings/cb34741b4887100ac5603a6518406aba",
+      "canonicalName": "projects/421458901689/sources/1405720631579532947/locations/global/findings/cb34741b4887100ac5603a6518406aba",
+      "category": "MASTER_AUTHORIZED_NETWORKS_DISABLED",
+      "resourceName": "//container.googleapis.com/projects/project-69726555-c4de-48de-a69/zones/europe-north1-a/clusters/k8-lab",
+      "state": "ACTIVE",
+      "severity": "MEDIUM",
+      "findingClass": "MISCONFIGURATION",
+      "eventTime": "2026-09-19T22:05:22.735Z",
+      "description": "Control plane authorized networks improve security for your container cluster by blocking specified IP addresses from accessing your cluster\u2019s control plane.",
+      "externalUri": "https://console.cloud.google.com/kubernetes/clusters/details/europe-north1-a/k8-lab?project=project-69726555-c4de-48de-a69",
+      "parentDisplayName": "Security Health Analytics",
+      "sourceProperties": {
+        "Recommendation": "Go to https://console.cloud.google.com/kubernetes/clusters/details/europe-north1-a/k8-lab?project=project-69726555-c4de-48de-a69 click \"Edit\", and enable \"Control plane authorized networks\". Make sure to also specify the authorized networks you wish to use. Note that a cluster cannot be modified while it is reconfiguring itself.",
+        "ExceptionInstructions": "Add the security mark \"allow_master_authorized_networks_disabled\" to the asset with a value of \"true\" to prevent this finding from being activated again.",
+        "Explanation": "Control plane authorized networks improve security for your container cluster by blocking specified IP addresses from accessing your cluster\u2019s control plane.",
+        "ScannerName": "CONTAINER_SCANNER",
+        "ResourcePath": [
+          "projects/project-69726555-c4de-48de-a69/",
+          "organizations/550178366891/"
+        ],
+        "compliance_standards": {
+          "pci": [
+            {
+              "ids": [
+                "1.2.1",
+                "1.3.2"
+              ]
+            }
+          ],
+          "cis": [
+            {
+              "version": "1.0",
+              "ids": [
+                "7.4"
+              ]
+            },
+            {
+              "version": "1.0",
+              "ids": [
+                "6.6.3"
+              ]
+            }
+          ]
+        },
+        "ReactivationCount": 0
+      }
+    },
+    "cite": "checkov:CKV_GCP_20:module.gke.google_container_cluster.main"
+  }
+]
