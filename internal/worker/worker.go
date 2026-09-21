@@ -16,6 +16,7 @@ import (
 
 	"github.com/sindredg/ai-k8s/internal/corpus"
 	"github.com/sindredg/ai-k8s/internal/ledger"
+	"github.com/sindredg/ai-k8s/internal/model"
 	"github.com/sindredg/ai-k8s/internal/notify"
 	"github.com/sindredg/ai-k8s/internal/scc"
 	"github.com/sindredg/ai-k8s/internal/verdict"
@@ -41,6 +42,9 @@ type Worker struct {
 	Provenance verdict.Provenance
 	Log        *slog.Logger
 	Counters   Counters
+
+	// Model settles what the rules left unmatched. Nil runs the rules alone, which is Increment 1.
+	Model *model.Settler
 
 	// CrashAt names the boundary a drill stops the worker at. Empty everywhere but a drill.
 	CrashAt ledger.State
@@ -170,7 +174,10 @@ func (w *Worker) recordFor(ctx context.Context, key string, state ledger.State, 
 		return record, nil
 	}
 
-	record := w.classify(env, parseErr)
+	record, err := w.settle(ctx, env, parseErr)
+	if err != nil {
+		return verdict.Record{}, err
+	}
 	if err := record.Validate(); err != nil {
 		// Output that does not validate is rejected rather than read for meaning.
 		record = verdict.Insufficient(env, []string{"the verdict record did not validate: " + err.Error()}, w.Provenance)
@@ -194,6 +201,35 @@ func (w *Worker) recordFor(ctx context.Context, key string, state ledger.State, 
 
 	w.count(record)
 	return record, nil
+}
+
+// settle runs the rules, and asks the model only about a complete finding they left unmatched. A call
+// that does not complete is an error: nothing is on record yet, and the message goes back unacknowledged.
+func (w *Worker) settle(ctx context.Context, env *scc.Envelope, parseErr error) (verdict.Record, error) {
+	record := w.classify(env, parseErr)
+	if w.Model == nil || parseErr != nil || record.Verdict != verdict.New {
+		return record, nil
+	}
+
+	outcome, err := w.Model.Settle(ctx, env, w.Provenance)
+	if err != nil {
+		w.Counters.Add(func(c *Counts) { c.ModelErrors++ })
+		return verdict.Record{}, err
+	}
+	w.Counters.Add(func(c *Counts) {
+		if outcome.Called {
+			c.ModelCalls++
+		}
+		switch outcome.Refusal {
+		case model.RefusedBudget:
+			c.RefusedBudget++
+		case model.RefusedCeiling:
+			c.RefusedCeiling++
+		case model.RejectedOutput, model.RejectedCitation, model.RejectedAcceptance:
+			c.ModelOutputRejected++
+		}
+	})
+	return outcome.Record, nil
 }
 
 // classify settles the finding, or refuses to when a required field never arrived.

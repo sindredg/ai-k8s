@@ -226,3 +226,33 @@ func TestResolveCitationsFillsSummaryAndSourceFromTheCorpus(t *testing.T) {
 		t.Errorf("Source = %q, want it taken from the corpus", r.Citations[0].Source)
 	}
 }
+
+func TestTheModelCannotSettleAFindingAsAccepted(t *testing.T) {
+	r := Record{
+		SchemaVersion: SchemaVersion, Verdict: Accepted, SettledBy: SettledByModel, CorpusMatch: MatchMatched,
+		Citations: []Citation{{ID: "threat:10"}},
+		Finding:   FindingRef{Digest: "sha256:d", Category: "C", Severity: "LOW"},
+	}
+	if err := r.Validate(); err == nil || !strings.Contains(err.Error(), "never settles a finding as accepted") {
+		t.Fatalf("got %v", err)
+	}
+	r.SettledBy = SettledByRules
+	if err := r.Validate(); err != nil {
+		t.Fatalf("the same record settled by rules is valid, got %v", err)
+	}
+}
+
+func TestAContradictionOnAnUnmatchedFindingStandsOnItsCitations(t *testing.T) {
+	r := Record{
+		SchemaVersion: SchemaVersion, Verdict: ContradictsDecision, SettledBy: SettledByModel, CorpusMatch: MatchNone,
+		Citations: []Citation{{ID: "control:pod-security-restricted"}},
+		Finding:   FindingRef{Digest: "sha256:d", Category: "C", Severity: "LOW"},
+	}
+	if err := r.Validate(); err != nil {
+		t.Fatalf("got %v", err)
+	}
+	r.Citations = nil
+	if err := r.Validate(); err == nil {
+		t.Fatal("a contradiction citing nothing validated")
+	}
+}

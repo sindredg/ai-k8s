@@ -17,6 +17,13 @@ type Counts struct {
 	InsufficientEvidence   int `json:"insufficient_evidence"`
 	NotificationsSent      int `json:"notifications_sent"`
 	Failed                 int `json:"failed"`
+
+	// The model's half. A call is money spent; an error is a call that did not complete.
+	ModelCalls          int `json:"model_calls"`
+	ModelErrors         int `json:"model_errors"`
+	ModelOutputRejected int `json:"model_output_rejected"`
+	RefusedBudget       int `json:"refused_budget"`
+	RefusedCeiling      int `json:"refused_ceiling"`
 }
 
 // Counters is a Counts guarded for the concurrent receive the Pub/Sub client runs.
