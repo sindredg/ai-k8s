@@ -17,6 +17,26 @@ The rules run first. Vertex AI is asked only about a complete finding the review
 unmatched, and it can return `new`, `contradicts_decision` or `insufficient_evidence`, never
 `accepted`.
 
+## Status
+
+The triage worker runs in `k8-lab` at [`a2159a1`](https://github.com/sindredg/ai-k8s/tree/a2159a1)
+with `gemini-2.5-flash`. The project closed on 2026-09-22. The other agents in the
+[k8-lab plan](https://github.com/sindredg/k8-lab/blob/main/plan.md#status) were not built.
+
+| Measured, `gemini-2.5-flash`, five runs per case | Rules alone | Rules plus the model |
+| --- | --- | --- |
+| Dev cases right on every run, of 18 | 14 | 16 |
+| Holdout cases right on every run, of 7 | 5 | 7 |
+| False contradictions, of 125 model-path runs | | 0, from 15 before contradictions had to land on a control |
+| Unsupported citations | | 0 |
+| Latency p95 per call | | about 2 seconds |
+| Cost per call | | about 0.003 USD, estimated from tokens |
+
+Still wrong on dev: a finding naming no workload is `new` where `insufficient_evidence` is right,
+and a planted note naming a real corpus id turns `new` into `insufficient_evidence`. Evidence is in
+[the Phase 15 worklog](https://github.com/sindredg/k8-lab/blob/main/worklog/phase-15-scc-triage.md#slice-14-a-contradiction-has-to-land-on-something),
+and the raw results are in [`eval/results`](eval/results).
+
 ## The verdict contract
 
 Four values, and the worker separates them rather than the model.
