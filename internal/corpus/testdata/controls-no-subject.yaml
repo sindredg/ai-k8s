@@ -1,0 +1,4 @@
+controls:
+  - slug: holds-for-nothing
+    statement: Something is enforced somewhere.
+    proof: worklog/phase-04-workload-guardrails.md

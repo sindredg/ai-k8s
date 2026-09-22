@@ -23,6 +23,16 @@ func TestLoadControlsAddsOneEntryPerSlug(t *testing.T) {
 	if !strings.Contains(e.Source, "phase-15-scc-triage.md") {
 		t.Errorf("Source = %q, want the worklog that proved the control", e.Source)
 	}
+	if len(e.AppliesTo) != 1 || e.AppliesTo[0] != "//k8s.io/core/v1/namespaces/agents/" {
+		t.Errorf("AppliesTo = %v, want the namespace the control holds for", e.AppliesTo)
+	}
+}
+
+func TestLoadControlsRejectsAControlThatAppliesToNothing(t *testing.T) {
+	err := LoadControls(NewIndex(), "testdata/controls-no-subject.yaml")
+	if err == nil || !strings.Contains(err.Error(), "holds-for-nothing") {
+		t.Fatalf("LoadControls returned %v, want a refusal naming the control", err)
+	}
 }
 
 func TestLoadControlsRejectsAControlWithNoProof(t *testing.T) {

@@ -60,13 +60,14 @@ func ReadResults(path string) (*Results, error) {
 // CorpusDigests splits the corpus by where it comes from, over exactly what the model is shown.
 func CorpusDigests(idx *corpus.Index) (local, upstream string) {
 	type shown struct {
-		ID      corpus.ID   `json:"id"`
-		Kind    corpus.Kind `json:"kind"`
-		Summary string      `json:"summary"`
+		ID        corpus.ID   `json:"id"`
+		Kind      corpus.Kind `json:"kind"`
+		Summary   string      `json:"summary"`
+		AppliesTo []string    `json:"applies_to,omitempty"`
 	}
 	var mine, theirs []shown
 	for _, e := range idx.Entries {
-		s := shown{e.ID, e.Kind, e.Summary}
+		s := shown{e.ID, e.Kind, e.Summary, e.AppliesTo}
 		if strings.HasPrefix(string(e.ID), "control:") {
 			mine = append(mine, s)
 		} else {
