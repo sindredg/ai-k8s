@@ -44,9 +44,10 @@
       ],
       "support": [
         "checkov:CKV_GCP_66:module.gke.google_container_cluster.main",
-        "threat:10"
+        "threat:10",
+        "decision:supply-chain-control-timing"
       ],
-      "why": "The gap is accepted on the zones spelling of what is probably the same cluster. Only the mapping may accept, and exact matching misses this spelling. The best available answer names the identity of the resource as the missing fact. The recorded acceptance holds, so contradicts_decision is wrong.",
+      "why": "The gap is accepted on the zones spelling of what is probably the same cluster. Only the mapping may accept, and exact matching misses this spelling. The best available answer names the identity of the resource as the missing fact. The recorded acceptance holds, so contradicts_decision is wrong. Key corrected on 2026-09-22 after the first run: the supporting list left out decision:supply-chain-control-timing, which defers admission enforcement, which bears on this finding. The first run is recorded with the old key.",
       "evidence": "mapping.yaml header: Security Health Analytics writes zones and Event Threat Detection writes locations",
       "finding": "binary-authorization",
       "set": {
@@ -62,10 +63,11 @@
         "insufficient_evidence"
       ],
       "support": [
-        "control:tls-floor-and-rate-limit"
+        "control:tls-floor-and-rate-limit",
+        "threat:5"
       ],
       "require": "control:tls-floor-and-rate-limit",
-      "why": "The control says the public endpoint refuses TLS 1.0 and 1.1. A finding that its SSL policy allows TLS 1.0 is that control failing.",
+      "why": "The control says the public endpoint refuses TLS 1.0 and 1.1. A finding that its SSL policy allows TLS 1.0 is that control failing. Key corrected on 2026-09-22 after the first run: the supporting list left out threat:5, closed with a measured TLS 1.2 floor, which bears on this finding. The first run is recorded with the old key.",
       "evidence": "controls.yaml tls-floor-and-rate-limit, measured in k8-lab worklog/phase-14-close-the-baseline.md",
       "finding": "weak-ssl-policy-gateway"
     },

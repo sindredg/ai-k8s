@@ -210,10 +210,12 @@
         "insufficient_evidence"
       ],
       "support": [
-        "control:workload-identity-no-keys"
+        "control:workload-identity-no-keys",
+        "decision:workload-identity",
+        "decision:pipeline-authentication"
       ],
       "require": "control:workload-identity-no-keys",
-      "why": "The control says k8-lab-triage holds no service account key. A finding that it holds one is the control failing, on the resource the control names.",
+      "why": "The control says k8-lab-triage holds no service account key. A finding that it holds one is the control failing, on the resource the control names. Key corrected on 2026-09-22 after the first run: the supporting list left out decision:workload-identity and decision:pipeline-authentication, which says to create no user-managed service account keys, which bears on this finding. The first run is recorded with the old key.",
       "evidence": "controls.yaml workload-identity-no-keys; the user-managed key list was read empty in k8-lab worklog/phase-15-scc-triage.md#the-identity-and-the-label-that-gates-it",
       "finding": "user-managed-key-triage"
     },
