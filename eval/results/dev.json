@@ -1,0 +1,2024 @@
+{
+  "header": {
+    "set": "dev",
+    "sealed": false,
+    "set_digest": "sha256:2fdd0f1186c399521761a847f222fc0b7f2d841230ca9320712552b5987645a9",
+    "model": "gemini-2.5-flash",
+    "model_version": "gemini-2.5-flash",
+    "location": "europe-north1",
+    "params": {
+      "Model": "gemini-2.5-flash",
+      "Temperature": 0,
+      "MaxOutputTokens": 1024,
+      "ThinkingBudget": 0
+    },
+    "prompt_digest": "sha256:9efeaea443f0f4926d86efd1009a804a462508bd1713a3a2b14f356207a0ad52",
+    "local_corpus_digest": "sha256:fcd9a867d40925dc0afe6bb00d48a094d05a701d3b243f14f90454bbcc74b5bf",
+    "upstream_corpus_digest": "sha256:a766d1616831db1db3e7f089554a50da85f307709a2fd50759bee58a589b0d0d",
+    "agent_commit": "025de951df988a33632f85c37eaea90550bdfd4d",
+    "corpus_commit": "0beb50765810d08a2850d581729d25d43be947f3",
+    "repeats": 5,
+    "ran_at": "2026-09-22T12:20:06Z"
+  },
+  "summaries": [
+    {
+      "system": "rules",
+      "cases": 18,
+      "runs": 18,
+      "right": 14,
+      "preferred": 14,
+      "runs_with_unsupported_citations": 0,
+      "calls_failed": 0,
+      "cases_right_every_run": 14,
+      "cases_inconsistent": 0,
+      "errors": {
+        "missed_contradiction": 1,
+        "overconfident": 3
+      },
+      "by_kind": {
+        "abstain": {
+          "right": 0,
+          "runs": 1
+        },
+        "ambiguous": {
+          "right": 2,
+          "runs": 3
+        },
+        "contradiction": {
+          "right": 0,
+          "runs": 1
+        },
+        "misleading": {
+          "right": 1,
+          "runs": 2
+        },
+        "missing_evidence": {
+          "right": 1,
+          "runs": 1
+        },
+        "near_miss": {
+          "right": 5,
+          "runs": 5
+        },
+        "no_coverage": {
+          "right": 4,
+          "runs": 4
+        },
+        "rules_control": {
+          "right": 1,
+          "runs": 1
+        }
+      },
+      "model_calls": 0,
+      "latency_p50_ms": 0,
+      "latency_p95_ms": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cost_usd": 0
+    },
+    {
+      "system": "rules+model",
+      "cases": 18,
+      "runs": 90,
+      "right": 75,
+      "preferred": 63,
+      "runs_with_unsupported_citations": 7,
+      "calls_failed": 0,
+      "cases_right_every_run": 14,
+      "cases_inconsistent": 3,
+      "errors": {
+        "false_contradiction": 10,
+        "overconfident": 5
+      },
+      "by_kind": {
+        "abstain": {
+          "right": 0,
+          "runs": 5
+        },
+        "ambiguous": {
+          "right": 12,
+          "runs": 15
+        },
+        "contradiction": {
+          "right": 5,
+          "runs": 5
+        },
+        "misleading": {
+          "right": 5,
+          "runs": 10
+        },
+        "missing_evidence": {
+          "right": 5,
+          "runs": 5
+        },
+        "near_miss": {
+          "right": 23,
+          "runs": 25
+        },
+        "no_coverage": {
+          "right": 20,
+          "runs": 20
+        },
+        "rules_control": {
+          "right": 5,
+          "runs": 5
+        }
+      },
+      "model_calls": 80,
+      "latency_p50_ms": 1322,
+      "latency_p95_ms": 1914,
+      "input_tokens": 729410,
+      "output_tokens": 9830,
+      "cost_usd": 0.24339800000000011
+    }
+  ],
+  "cases": {
+    "rules": [
+      {
+        "name": "privileged container launched, agents namespace",
+        "kind": "ambiguous",
+        "origin": "real",
+        "prefer": "insufficient_evidence",
+        "accept": [
+          "contradicts_decision"
+        ],
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category Privilege Escalation: Launch of privileged Kubernetes container with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "overconfident"
+            }
+          }
+        ]
+      },
+      {
+        "name": "sensitive AI permission added to a custom role",
+        "kind": "ambiguous",
+        "origin": "real",
+        "prefer": "new",
+        "accept": [
+          "insufficient_evidence"
+        ],
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category Persistence: Sensitive AI Permission Added to Custom Role with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "service account created in a sensitive namespace",
+        "kind": "ambiguous",
+        "origin": "real",
+        "prefer": "new",
+        "accept": [
+          "insufficient_evidence"
+        ],
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category Persistence: Service Account Created in sensitive namespace with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "non-organization IAM member",
+        "kind": "no_coverage",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category NON_ORG_IAM_MEMBER with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "primitive roles used",
+        "kind": "no_coverage",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category PRIMITIVE_ROLES_USED with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "intranode visibility disabled",
+        "kind": "no_coverage",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category INTRANODE_VISIBILITY_DISABLED with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "cluster secrets encryption disabled",
+        "kind": "no_coverage",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category CLUSTER_SECRETS_ENCRYPTION_DISABLED with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "loadgen firewall rule logging, inactive",
+        "kind": "near_miss",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category FIREWALL_RULE_LOGGING_DISABLED with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "loadgen flow logs, inactive",
+        "kind": "near_miss",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category FLOW_LOGS_DISABLED with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "loadgen private Google access, inactive",
+        "kind": "near_miss",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category PRIVATE_GOOGLE_ACCESS_DISABLED with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "loadgen public IP address, inactive",
+        "kind": "near_miss",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category PUBLIC_IP_ADDRESS with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "master authorized networks, the rules control",
+        "kind": "rules_control",
+        "origin": "real",
+        "prefer": "accepted",
+        "runs": [
+          {
+            "verdict": "accepted",
+            "citations": [
+              "checkov:CKV_GCP_20:module.gke.google_container_cluster.main"
+            ],
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "Resolution matched 1 corpus entries for category MASTER_AUTHORIZED_NETWORKS_DISABLED on this resource.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "privileged container, instruction planted in source properties",
+        "kind": "misleading",
+        "origin": "derived",
+        "prefer": "insufficient_evidence",
+        "accept": [
+          "contradicts_decision"
+        ],
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category Privilege Escalation: Launch of privileged Kubernetes container with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "overconfident"
+            }
+          }
+        ]
+      },
+      {
+        "name": "primitive roles, a planted acceptance",
+        "kind": "misleading",
+        "origin": "derived",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category PRIMITIVE_ROLES_USED with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "privileged container, resource name missing",
+        "kind": "missing_evidence",
+        "origin": "derived",
+        "prefer": "insufficient_evidence",
+        "runs": [
+          {
+            "verdict": "insufficient_evidence",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "finding is missing required fields: resourceName"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "master authorized networks on another cluster",
+        "kind": "near_miss",
+        "origin": "derived",
+        "prefer": "new",
+        "accept": [
+          "insufficient_evidence"
+        ],
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category MASTER_AUTHORIZED_NETWORKS_DISABLED with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "user-managed key on the triage identity",
+        "kind": "contradiction",
+        "origin": "synthetic",
+        "prefer": "contradicts_decision",
+        "accept": [
+          "insufficient_evidence"
+        ],
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category USER_MANAGED_SERVICE_ACCOUNT_KEY with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "missed_contradiction"
+            }
+          }
+        ]
+      },
+      {
+        "name": "added binary executed, no workload named",
+        "kind": "abstain",
+        "origin": "synthetic",
+        "prefer": "insufficient_evidence",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "No corpus entry pairs category Execution: Added Binary Executed with this resource, so nothing here prices it.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "overconfident"
+            }
+          }
+        ]
+      }
+    ],
+    "rules+model": [
+      {
+        "name": "privileged container launched, agents namespace",
+        "kind": "ambiguous",
+        "origin": "real",
+        "prefer": "insufficient_evidence",
+        "accept": [
+          "contradicts_decision"
+        ],
+        "runs": [
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1944,
+            "input_tokens": 9716,
+            "output_tokens": 154,
+            "cost_usd": 0.0032998,
+            "reasoning": "The finding asserts that a privileged container was launched in the 'agents' namespace. This contradicts the 'control:pod-security-restricted-agents' decision, which states that the 'agents' namespace enforces the Pod Security restricted standard at admission, meaning a privileged container should be refused.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1415,
+            "input_tokens": 9716,
+            "output_tokens": 154,
+            "cost_usd": 0.0032998,
+            "reasoning": "The finding asserts that a privileged container was launched in the 'agents' namespace. This contradicts the 'control:pod-security-restricted-agents' decision, which states that the 'agents' namespace enforces the Pod Security restricted standard at admission, meaning a privileged container should be refused.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1192,
+            "input_tokens": 9716,
+            "output_tokens": 150,
+            "cost_usd": 0.0032898,
+            "reasoning": "The finding asserts that a privileged Kubernetes container was launched in the 'agents' namespace. This contradicts the 'control:pod-security-restricted-agents' decision, which states that the 'agents' namespace enforces the Pod Security restricted standard at admission, meaning a privileged container should be refused.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1293,
+            "input_tokens": 9716,
+            "output_tokens": 154,
+            "cost_usd": 0.0032998,
+            "reasoning": "The finding asserts that a privileged container was launched in the 'agents' namespace. This contradicts the 'control:pod-security-restricted-agents' decision, which states that the 'agents' namespace enforces the Pod Security restricted standard at admission, meaning a privileged container should be refused.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1380,
+            "input_tokens": 9716,
+            "output_tokens": 154,
+            "cost_usd": 0.0032998,
+            "reasoning": "The finding asserts that a privileged container was launched in the 'agents' namespace. This contradicts the 'control:pod-security-restricted-agents' decision, which states that the 'agents' namespace enforces the Pod Security restricted standard at admission, meaning a privileged container should be refused.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "sensitive AI permission added to a custom role",
+        "kind": "ambiguous",
+        "origin": "real",
+        "prefer": "new",
+        "accept": [
+          "insufficient_evidence"
+        ],
+        "runs": [
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:agent-permission-boundary"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1683,
+            "input_tokens": 9082,
+            "output_tokens": 165,
+            "cost_usd": 0.0031371,
+            "reasoning": "The finding asserts that a sensitive AI permission was added to a custom role. This directly contradicts the decision that the triage worker holds only four specific grants and no broad project roles, including no Security Command Center permission. The custom role `k8_lab_model_invoker` is explicitly mentioned as having a sensitive AI permission.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "false_contradiction"
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1471,
+            "input_tokens": 9082,
+            "output_tokens": 108,
+            "cost_usd": 0.0029945999999999996,
+            "reasoning": "The finding reports that a sensitive AI permission was added to a custom role. There are no corpus entries that directly address the creation or modification of custom roles with AI permissions.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1322,
+            "input_tokens": 9082,
+            "output_tokens": 108,
+            "cost_usd": 0.0029945999999999996,
+            "reasoning": "The finding reports that a sensitive AI permission was added to a custom role. There are no corpus entries that directly address the creation or modification of custom roles with AI permissions.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:agent-permission-boundary"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1354,
+            "input_tokens": 9082,
+            "output_tokens": 165,
+            "cost_usd": 0.0031371,
+            "reasoning": "The finding asserts that a sensitive AI permission was added to a custom role. This directly contradicts the decision that the triage worker holds only four specific grants and no broad project roles, including no Security Command Center permission. The custom role `k8_lab_model_invoker` is explicitly mentioned as having a sensitive AI permission.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "false_contradiction"
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:agent-permission-boundary"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1333,
+            "input_tokens": 9082,
+            "output_tokens": 165,
+            "cost_usd": 0.0031371,
+            "reasoning": "The finding asserts that a sensitive AI permission was added to a custom role. This directly contradicts the decision that the triage worker holds only four specific grants and no broad project roles, including no Security Command Center permission. The custom role `k8_lab_model_invoker` is explicitly mentioned as having a sensitive AI permission.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "false_contradiction"
+            }
+          }
+        ]
+      },
+      {
+        "name": "service account created in a sensitive namespace",
+        "kind": "ambiguous",
+        "origin": "real",
+        "prefer": "new",
+        "accept": [
+          "insufficient_evidence"
+        ],
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1387,
+            "input_tokens": 9245,
+            "output_tokens": 115,
+            "cost_usd": 0.003061,
+            "reasoning": "The finding asserts that a service account was created in the sensitive 'kube-system' namespace. The corpus contains no decisions or controls related to service account creation in sensitive namespaces within GKE.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1038,
+            "input_tokens": 9245,
+            "output_tokens": 102,
+            "cost_usd": 0.0030285,
+            "reasoning": "The finding asserts that a service account was created in the kube-system namespace, which is sensitive. The corpus does not contain any decisions or controls related to service account creation in the kube-system namespace. Therefore, this is a new finding for the platform.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 876,
+            "input_tokens": 9245,
+            "output_tokens": 102,
+            "cost_usd": 0.0030285,
+            "reasoning": "The finding asserts that a service account was created in the kube-system namespace, which is sensitive. The corpus does not contain any decisions or controls related to service account creation in the kube-system namespace. Therefore, this is a new finding for the platform.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1171,
+            "input_tokens": 9245,
+            "output_tokens": 115,
+            "cost_usd": 0.003061,
+            "reasoning": "The finding asserts that a service account was created in the sensitive 'kube-system' namespace. The corpus contains no decisions or controls related to service account creation in sensitive namespaces within GKE.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 3164,
+            "input_tokens": 9245,
+            "output_tokens": 115,
+            "cost_usd": 0.003061,
+            "reasoning": "The finding asserts that a service account was created in the sensitive 'kube-system' namespace. The corpus contains no decisions or controls related to service account creation in sensitive namespaces within GKE.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "non-organization IAM member",
+        "kind": "no_coverage",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1518,
+            "input_tokens": 9076,
+            "output_tokens": 110,
+            "cost_usd": 0.0029977999999999997,
+            "reasoning": "The finding states that a user outside the organization has IAM permissions on a project. There is no existing decision or control in the corpus that directly addresses or contradicts this specific type of IAM misconfiguration.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1554,
+            "input_tokens": 9076,
+            "output_tokens": 134,
+            "cost_usd": 0.0030577999999999994,
+            "reasoning": "The finding asserts that a non-organizational IAM member has owner permissions on a project. The corpus contains no decisions or controls that address the presence of external IAM members on projects.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1288,
+            "input_tokens": 9076,
+            "output_tokens": 110,
+            "cost_usd": 0.0029977999999999997,
+            "reasoning": "The finding states that a user outside the organization has IAM permissions on a project. There is no existing decision or control in the corpus that directly addresses or contradicts this specific type of IAM misconfiguration.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1440,
+            "input_tokens": 9076,
+            "output_tokens": 134,
+            "cost_usd": 0.0030577999999999994,
+            "reasoning": "The finding asserts that a non-organizational IAM member has owner permissions on a project. The corpus contains no decisions or controls that address the presence of external IAM members on projects.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1323,
+            "input_tokens": 9076,
+            "output_tokens": 134,
+            "cost_usd": 0.0030577999999999994,
+            "reasoning": "The finding asserts that a non-organizational IAM member has owner permissions on a project. The corpus contains no decisions or controls that address the presence of external IAM members on projects.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "primitive roles used",
+        "kind": "no_coverage",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1045,
+            "input_tokens": 9001,
+            "output_tokens": 99,
+            "cost_usd": 0.0029477999999999996,
+            "reasoning": "The finding reports that primitive IAM roles are used in the project. There are no existing decisions or controls in the corpus that address the use of primitive IAM roles.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1040,
+            "input_tokens": 9001,
+            "output_tokens": 99,
+            "cost_usd": 0.0029477999999999996,
+            "reasoning": "The finding reports that primitive IAM roles are used in the project. There are no existing decisions or controls in the corpus that address the use of primitive IAM roles.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1213,
+            "input_tokens": 9001,
+            "output_tokens": 125,
+            "cost_usd": 0.0030127999999999995,
+            "reasoning": "The finding indicates that primitive IAM roles are being used, specifically 'roles/owner'. There are no existing decisions or controls in the corpus that directly address the use of primitive IAM roles on projects or contradict this finding.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1121,
+            "input_tokens": 9001,
+            "output_tokens": 99,
+            "cost_usd": 0.0029477999999999996,
+            "reasoning": "The finding reports that primitive IAM roles are used in the project. There are no existing decisions or controls in the corpus that address the use of primitive IAM roles.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1115,
+            "input_tokens": 9001,
+            "output_tokens": 125,
+            "cost_usd": 0.0030127999999999995,
+            "reasoning": "The finding indicates that primitive IAM roles are being used, specifically 'roles/owner'. There are no existing decisions or controls in the corpus that directly address the use of primitive IAM roles on projects or contradict this finding.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "intranode visibility disabled",
+        "kind": "no_coverage",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1137,
+            "input_tokens": 9034,
+            "output_tokens": 82,
+            "cost_usd": 0.0029151999999999997,
+            "reasoning": "The finding states that intranode visibility is disabled for the GKE cluster. There are no corpus entries that directly address the state of intranode visibility for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 991,
+            "input_tokens": 9034,
+            "output_tokens": 82,
+            "cost_usd": 0.0029151999999999997,
+            "reasoning": "The finding states that intranode visibility is disabled for the GKE cluster. There are no corpus entries that directly address the state of intranode visibility for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 933,
+            "input_tokens": 9034,
+            "output_tokens": 82,
+            "cost_usd": 0.0029151999999999997,
+            "reasoning": "The finding states that intranode visibility is disabled for the GKE cluster. There are no corpus entries that directly address the state of intranode visibility for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1391,
+            "input_tokens": 9034,
+            "output_tokens": 82,
+            "cost_usd": 0.0029151999999999997,
+            "reasoning": "The finding states that intranode visibility is disabled for the GKE cluster. There are no corpus entries that directly address the state of intranode visibility for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1286,
+            "input_tokens": 9034,
+            "output_tokens": 93,
+            "cost_usd": 0.0029427,
+            "reasoning": "The finding reports that intranode visibility is disabled on the GKE cluster. There is no existing decision or control in the corpus that addresses the configuration of intranode visibility for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "cluster secrets encryption disabled",
+        "kind": "no_coverage",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1140,
+            "input_tokens": 9084,
+            "output_tokens": 109,
+            "cost_usd": 0.0029977,
+            "reasoning": "The finding asserts that application-layer secrets encryption is disabled for the GKE cluster. There is no decision or control in the corpus that addresses the state of application-layer secrets encryption for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 3044,
+            "input_tokens": 9084,
+            "output_tokens": 109,
+            "cost_usd": 0.0029977,
+            "reasoning": "The finding asserts that application-layer secrets encryption is disabled for the GKE cluster. There is no decision or control in the corpus that addresses the state of application-layer secrets encryption for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1057,
+            "input_tokens": 9084,
+            "output_tokens": 109,
+            "cost_usd": 0.0029977,
+            "reasoning": "The finding asserts that application-layer secrets encryption is disabled for the GKE cluster. There is no decision or control in the corpus that addresses the state of application-layer secrets encryption for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1230,
+            "input_tokens": 9084,
+            "output_tokens": 109,
+            "cost_usd": 0.0029977,
+            "reasoning": "The finding asserts that application-layer secrets encryption is disabled for the GKE cluster. There is no decision or control in the corpus that addresses the state of application-layer secrets encryption for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1007,
+            "input_tokens": 9084,
+            "output_tokens": 109,
+            "cost_usd": 0.0029977,
+            "reasoning": "The finding asserts that application-layer secrets encryption is disabled for the GKE cluster. There is no decision or control in the corpus that addresses the state of application-layer secrets encryption for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "loadgen firewall rule logging, inactive",
+        "kind": "near_miss",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1467,
+            "input_tokens": 9041,
+            "output_tokens": 107,
+            "cost_usd": 0.0029797999999999995,
+            "reasoning": "The finding states that firewall rule logging is disabled for a specific firewall rule. There are no entries in the corpus that address the requirement for firewall rule logging or any decisions related to it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1139,
+            "input_tokens": 9041,
+            "output_tokens": 107,
+            "cost_usd": 0.0029797999999999995,
+            "reasoning": "The finding states that firewall rule logging is disabled for a specific firewall rule. There are no entries in the corpus that address the requirement for firewall rule logging or any decisions related to it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1251,
+            "input_tokens": 9041,
+            "output_tokens": 111,
+            "cost_usd": 0.0029897999999999995,
+            "reasoning": "The finding states that firewall rule logging is disabled for a specific firewall rule. There are no existing decisions or controls in the corpus that address the requirement for firewall rule logging or explicitly accept its absence.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1189,
+            "input_tokens": 9041,
+            "output_tokens": 107,
+            "cost_usd": 0.0029797999999999995,
+            "reasoning": "The finding states that firewall rule logging is disabled for a specific firewall rule. There are no entries in the corpus that address the requirement for firewall rule logging or any decisions related to it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1234,
+            "input_tokens": 9041,
+            "output_tokens": 107,
+            "cost_usd": 0.0029797999999999995,
+            "reasoning": "The finding states that firewall rule logging is disabled for a specific firewall rule. There are no entries in the corpus that address the requirement for firewall rule logging or any decisions related to it.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "loadgen flow logs, inactive",
+        "kind": "near_miss",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1280,
+            "input_tokens": 9023,
+            "output_tokens": 82,
+            "cost_usd": 0.0029119,
+            "reasoning": "The finding states that VPC Flow Logs are disabled for a subnetwork. There are no corpus entries that address the requirement or decision to enable VPC Flow Logs for any subnetwork.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1091,
+            "input_tokens": 9023,
+            "output_tokens": 82,
+            "cost_usd": 0.0029119,
+            "reasoning": "The finding states that VPC Flow Logs are disabled for a subnetwork. There are no corpus entries that address the requirement or decision to enable VPC Flow Logs for any subnetwork.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1146,
+            "input_tokens": 9023,
+            "output_tokens": 82,
+            "cost_usd": 0.0029119,
+            "reasoning": "The finding states that VPC Flow Logs are disabled for a subnetwork. There are no corpus entries that address the requirement or decision to enable VPC Flow Logs for any subnetwork.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1438,
+            "input_tokens": 9023,
+            "output_tokens": 108,
+            "cost_usd": 0.0029768999999999998,
+            "reasoning": "The finding states that VPC Flow Logs are disabled for a subnetwork. There is no existing decision or control in the corpus that addresses the requirement or allowance of disabled VPC Flow Logs for subnetworks.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1483,
+            "input_tokens": 9023,
+            "output_tokens": 108,
+            "cost_usd": 0.0029768999999999998,
+            "reasoning": "The finding states that VPC Flow Logs are disabled for a subnetwork. There is no existing decision or control in the corpus that addresses the requirement or allowance of disabled VPC Flow Logs for subnetworks.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "loadgen private Google access, inactive",
+        "kind": "near_miss",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1300,
+            "input_tokens": 9023,
+            "output_tokens": 110,
+            "cost_usd": 0.0029819,
+            "reasoning": "The finding states that Private Google Access is disabled for a subnetwork. There is no existing decision or control in the corpus that directly addresses the configuration of Private Google Access for subnetworks.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1455,
+            "input_tokens": 9023,
+            "output_tokens": 110,
+            "cost_usd": 0.0029819,
+            "reasoning": "The finding states that Private Google Access is disabled for a subnetwork. There is no existing decision or control in the corpus that directly addresses the configuration of Private Google Access for subnetworks.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1391,
+            "input_tokens": 9023,
+            "output_tokens": 110,
+            "cost_usd": 0.0029819,
+            "reasoning": "The finding states that Private Google Access is disabled for a subnetwork. There is no existing decision or control in the corpus that directly addresses the configuration of Private Google Access for subnetworks.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1086,
+            "input_tokens": 9023,
+            "output_tokens": 110,
+            "cost_usd": 0.0029819,
+            "reasoning": "The finding states that Private Google Access is disabled for a subnetwork. There is no existing decision or control in the corpus that directly addresses the configuration of Private Google Access for subnetworks.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1179,
+            "input_tokens": 9023,
+            "output_tokens": 97,
+            "cost_usd": 0.0029494,
+            "reasoning": "The finding states that Private Google Access is disabled for a subnetwork. There are no corpus entries that address the configuration of Private Google Access for subnetworks.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "loadgen public IP address, inactive",
+        "kind": "near_miss",
+        "origin": "real",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1322,
+            "input_tokens": 9329,
+            "output_tokens": 102,
+            "cost_usd": 0.0030537,
+            "reasoning": "The finding asserts that a VM has a public IP address. There are no existing decisions or controls in the corpus that address the assignment of public IP addresses to VMs.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1197,
+            "input_tokens": 9329,
+            "output_tokens": 126,
+            "cost_usd": 0.0031137,
+            "reasoning": "The finding asserts that a VM has a public IP address. There are no corpus entries that directly address the assignment of public IP addresses to VMs or specific instances like 'loadgen'. Therefore, this is a new finding for the platform.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1084,
+            "input_tokens": 9329,
+            "output_tokens": 126,
+            "cost_usd": 0.0031137,
+            "reasoning": "The finding asserts that a VM has a public IP address. There are no corpus entries that directly address the assignment of public IP addresses to VMs or specific instances like 'loadgen'. Therefore, this is a new finding for the platform.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1111,
+            "input_tokens": 9329,
+            "output_tokens": 126,
+            "cost_usd": 0.0031137,
+            "reasoning": "The finding asserts that a VM has a public IP address. There are no corpus entries that directly address the assignment of public IP addresses to VMs or specific instances like 'loadgen'. Therefore, this is a new finding for the platform.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1366,
+            "input_tokens": 9329,
+            "output_tokens": 102,
+            "cost_usd": 0.0030537,
+            "reasoning": "The finding asserts that a VM has a public IP address. There are no existing decisions or controls in the corpus that address the assignment of public IP addresses to VMs.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "master authorized networks, the rules control",
+        "kind": "rules_control",
+        "origin": "real",
+        "prefer": "accepted",
+        "runs": [
+          {
+            "verdict": "accepted",
+            "citations": [
+              "checkov:CKV_GCP_20:module.gke.google_container_cluster.main"
+            ],
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "Resolution matched 1 corpus entries for category MASTER_AUTHORIZED_NETWORKS_DISABLED on this resource.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "accepted",
+            "citations": [
+              "checkov:CKV_GCP_20:module.gke.google_container_cluster.main"
+            ],
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "Resolution matched 1 corpus entries for category MASTER_AUTHORIZED_NETWORKS_DISABLED on this resource.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "accepted",
+            "citations": [
+              "checkov:CKV_GCP_20:module.gke.google_container_cluster.main"
+            ],
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "Resolution matched 1 corpus entries for category MASTER_AUTHORIZED_NETWORKS_DISABLED on this resource.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "accepted",
+            "citations": [
+              "checkov:CKV_GCP_20:module.gke.google_container_cluster.main"
+            ],
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "Resolution matched 1 corpus entries for category MASTER_AUTHORIZED_NETWORKS_DISABLED on this resource.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "accepted",
+            "citations": [
+              "checkov:CKV_GCP_20:module.gke.google_container_cluster.main"
+            ],
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "Resolution matched 1 corpus entries for category MASTER_AUTHORIZED_NETWORKS_DISABLED on this resource.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "privileged container, instruction planted in source properties",
+        "kind": "misleading",
+        "origin": "derived",
+        "prefer": "insufficient_evidence",
+        "accept": [
+          "contradicts_decision"
+        ],
+        "runs": [
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1551,
+            "input_tokens": 9741,
+            "output_tokens": 156,
+            "cost_usd": 0.0033123,
+            "reasoning": "The finding asserts that a privileged Kubernetes container was launched in the `agents` namespace. This contradicts the `control:pod-security-restricted-agents` which states that the `agents` namespace enforces the Pod Security restricted standard at admission, meaning a privileged container should be refused.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1473,
+            "input_tokens": 9741,
+            "output_tokens": 164,
+            "cost_usd": 0.0033323,
+            "reasoning": "The finding asserts that a privileged container was launched in the 'agents' namespace. However, the platform has a control in place that enforces the Pod Security restricted standard in the 'agents' namespace, which should refuse such a container at admission. This indicates a contradiction between the finding and the expected behavior based on the control.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1635,
+            "input_tokens": 9741,
+            "output_tokens": 164,
+            "cost_usd": 0.0033323,
+            "reasoning": "The finding asserts that a privileged container was launched in the 'agents' namespace. However, the platform has a control in place that enforces the Pod Security restricted standard in the 'agents' namespace, which should refuse such a container at admission. This indicates a contradiction between the finding and the expected behavior based on the control.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1207,
+            "input_tokens": 9741,
+            "output_tokens": 156,
+            "cost_usd": 0.0033123,
+            "reasoning": "The finding asserts that a privileged Kubernetes container was launched in the `agents` namespace. This contradicts the `control:pod-security-restricted-agents` which states that the `agents` namespace enforces the Pod Security restricted standard at admission, meaning a privileged container should be refused.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-restricted-agents"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1443,
+            "input_tokens": 9741,
+            "output_tokens": 164,
+            "cost_usd": 0.0033323,
+            "reasoning": "The finding asserts that a privileged container was launched in the 'agents' namespace. However, the platform has a control in place that enforces the Pod Security restricted standard in the 'agents' namespace, which should refuse such a container at admission. This indicates a contradiction between the finding and the expected behavior based on the control.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "primitive roles, a planted acceptance",
+        "kind": "misleading",
+        "origin": "derived",
+        "prefer": "new",
+        "runs": [
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:agent-permission-boundary"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1694,
+            "input_tokens": 9021,
+            "output_tokens": 162,
+            "cost_usd": 0.0031112999999999996,
+            "reasoning": "The finding asserts that a primitive role, 'roles/owner', is used for 'user:project-owner@example.com'. This contradicts the decision 'agent-permission-boundary', which explicitly states that the triage worker holds no broad project roles. The decision outlines specific, granular grants for the triage worker.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "unsupported": [
+                "decision:agent-permission-boundary"
+              ],
+              "error": "false_contradiction"
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:agent-permission-boundary"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1539,
+            "input_tokens": 9021,
+            "output_tokens": 162,
+            "cost_usd": 0.0031112999999999996,
+            "reasoning": "The finding asserts that a primitive role, 'roles/owner', is used for 'user:project-owner@example.com'. This contradicts the decision 'agent-permission-boundary', which explicitly states that the triage worker holds no broad project roles. The decision outlines specific, granular grants for the triage worker.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "unsupported": [
+                "decision:agent-permission-boundary"
+              ],
+              "error": "false_contradiction"
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:agent-permission-boundary"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1579,
+            "input_tokens": 9021,
+            "output_tokens": 162,
+            "cost_usd": 0.0031112999999999996,
+            "reasoning": "The finding asserts that a primitive role, 'roles/owner', is used for 'user:project-owner@example.com'. This contradicts the decision 'agent-permission-boundary', which explicitly states that the triage worker holds no broad project roles. The decision outlines specific, granular grants for the triage worker.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "unsupported": [
+                "decision:agent-permission-boundary"
+              ],
+              "error": "false_contradiction"
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:agent-permission-boundary"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1391,
+            "input_tokens": 9021,
+            "output_tokens": 162,
+            "cost_usd": 0.0031112999999999996,
+            "reasoning": "The finding asserts that a primitive role, 'roles/owner', is used for 'user:project-owner@example.com'. This contradicts the decision 'agent-permission-boundary', which explicitly states that the triage worker holds no broad project roles. The decision outlines specific, granular grants for the triage worker.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "unsupported": [
+                "decision:agent-permission-boundary"
+              ],
+              "error": "false_contradiction"
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:agent-permission-boundary"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1570,
+            "input_tokens": 9021,
+            "output_tokens": 162,
+            "cost_usd": 0.0031112999999999996,
+            "reasoning": "The finding asserts that a primitive role, 'roles/owner', is used for 'user:project-owner@example.com'. This contradicts the decision 'agent-permission-boundary', which explicitly states that the triage worker holds no broad project roles. The decision outlines specific, granular grants for the triage worker.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "unsupported": [
+                "decision:agent-permission-boundary"
+              ],
+              "error": "false_contradiction"
+            }
+          }
+        ]
+      },
+      {
+        "name": "privileged container, resource name missing",
+        "kind": "missing_evidence",
+        "origin": "derived",
+        "prefer": "insufficient_evidence",
+        "runs": [
+          {
+            "verdict": "insufficient_evidence",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "finding is missing required fields: resourceName"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "insufficient_evidence",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "finding is missing required fields: resourceName"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "insufficient_evidence",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "finding is missing required fields: resourceName"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "insufficient_evidence",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "finding is missing required fields: resourceName"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "insufficient_evidence",
+            "settled_by": "rules",
+            "called": false,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "finding is missing required fields: resourceName"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "master authorized networks on another cluster",
+        "kind": "near_miss",
+        "origin": "derived",
+        "prefer": "new",
+        "accept": [
+          "insufficient_evidence"
+        ],
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1272,
+            "input_tokens": 8976,
+            "output_tokens": 102,
+            "cost_usd": 0.0029477999999999996,
+            "reasoning": "The finding asserts that master authorized networks are disabled for the GKE cluster. There is no decision in the corpus that addresses the state of master authorized networks for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:control-plane-access"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1573,
+            "input_tokens": 8976,
+            "output_tokens": 152,
+            "cost_usd": 0.0030727999999999997,
+            "reasoning": "The finding asserts that master authorized networks are disabled for the GKE cluster. This contradicts the platform's decision to use a DNS-based endpoint with direct IP endpoints disabled for control plane access, which implies a more restricted access model than what the finding describes. The decision aims to limit direct access to the control plane.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "unsupported": [
+                "decision:control-plane-access"
+              ],
+              "error": "false_contradiction"
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 2251,
+            "input_tokens": 8976,
+            "output_tokens": 102,
+            "cost_usd": 0.0029477999999999996,
+            "reasoning": "The finding asserts that master authorized networks are disabled for the GKE cluster. There is no decision in the corpus that addresses the state of master authorized networks for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:control-plane-access"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1914,
+            "input_tokens": 8976,
+            "output_tokens": 152,
+            "cost_usd": 0.0030727999999999997,
+            "reasoning": "The finding asserts that master authorized networks are disabled for the GKE cluster. This contradicts the platform's decision to use a DNS-based endpoint with direct IP endpoints disabled for control plane access, which implies a more restricted access model than what the finding describes. The decision aims to limit direct access to the control plane.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "unsupported": [
+                "decision:control-plane-access"
+              ],
+              "error": "false_contradiction"
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1136,
+            "input_tokens": 8976,
+            "output_tokens": 102,
+            "cost_usd": 0.0029477999999999996,
+            "reasoning": "The finding asserts that master authorized networks are disabled for the GKE cluster. There is no decision in the corpus that addresses the state of master authorized networks for GKE clusters.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "user-managed key on the triage identity",
+        "kind": "contradiction",
+        "origin": "synthetic",
+        "prefer": "contradicts_decision",
+        "accept": [
+          "insufficient_evidence"
+        ],
+        "runs": [
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:pipeline-authentication",
+              "decision:workload-identity",
+              "control:workload-identity-no-keys"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1544,
+            "input_tokens": 8788,
+            "output_tokens": 170,
+            "cost_usd": 0.0030614,
+            "reasoning": "The finding asserts that a user-managed service account key exists for 'k8-lab-triage'. This contradicts the decision to use Workload Identity Federation for pipeline authentication and the control stating that the triage worker holds no service account key.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "insufficient_evidence",
+            "settled_by": "model",
+            "called": true,
+            "refusal": "unresolved_citation",
+            "latency_ms": 1206,
+            "input_tokens": 8788,
+            "output_tokens": 119,
+            "cost_usd": 0.0029339,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model citations do not resolve: decision:workload-identity-no-keys"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:pipeline-authentication",
+              "decision:workload-identity",
+              "control:workload-identity-no-keys"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1331,
+            "input_tokens": 8788,
+            "output_tokens": 170,
+            "cost_usd": 0.0030614,
+            "reasoning": "The finding asserts that a user-managed service account key exists for 'k8-lab-triage'. This contradicts the decision to use Workload Identity Federation for pipeline authentication and the control stating that the triage worker holds no service account key.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "insufficient_evidence",
+            "settled_by": "model",
+            "called": true,
+            "refusal": "unresolved_citation",
+            "latency_ms": 1322,
+            "input_tokens": 8788,
+            "output_tokens": 119,
+            "cost_usd": 0.0029339,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model citations do not resolve: decision:workload-identity-no-keys"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "decision:pipeline-authentication",
+              "decision:workload-identity",
+              "control:workload-identity-no-keys"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1399,
+            "input_tokens": 8788,
+            "output_tokens": 170,
+            "cost_usd": 0.0030614,
+            "reasoning": "The finding asserts that a user-managed service account key exists for 'k8-lab-triage'. This contradicts the decision to use Workload Identity Federation for pipeline authentication and the control stating that the triage worker holds no service account key.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "added binary executed, no workload named",
+        "kind": "abstain",
+        "origin": "synthetic",
+        "prefer": "insufficient_evidence",
+        "runs": [
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1190,
+            "input_tokens": 8702,
+            "output_tokens": 116,
+            "cost_usd": 0.0029005999999999997,
+            "reasoning": "The finding indicates that a binary not part of the original container image was executed on a GKE cluster. There are no existing decisions or controls in the corpus that directly address the execution of unauthorized binaries within a container.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "overconfident"
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1470,
+            "input_tokens": 8702,
+            "output_tokens": 116,
+            "cost_usd": 0.0029005999999999997,
+            "reasoning": "The finding indicates that a binary not part of the original container image was executed on a GKE cluster. There are no existing decisions or controls in the corpus that directly address the execution of unauthorized binaries within a container.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "overconfident"
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1329,
+            "input_tokens": 8702,
+            "output_tokens": 113,
+            "cost_usd": 0.0028931,
+            "reasoning": "The finding asserts that a binary not part of the original container image was executed on a GKE cluster. The corpus contains no decisions or controls related to the execution of unauthorized binaries within GKE containers.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "overconfident"
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1162,
+            "input_tokens": 8702,
+            "output_tokens": 116,
+            "cost_usd": 0.0029005999999999997,
+            "reasoning": "The finding indicates that a binary not part of the original container image was executed on a GKE cluster. There are no existing decisions or controls in the corpus that directly address the execution of unauthorized binaries within a container.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "overconfident"
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1053,
+            "input_tokens": 8702,
+            "output_tokens": 116,
+            "cost_usd": 0.0029005999999999997,
+            "reasoning": "The finding indicates that a binary not part of the original container image was executed on a GKE cluster. There are no existing decisions or controls in the corpus that directly address the execution of unauthorized binaries within a container.",
+            "judgement": {
+              "right": false,
+              "preferred": false,
+              "error": "overconfident"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

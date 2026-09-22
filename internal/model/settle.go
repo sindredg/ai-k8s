@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/sindredg/ai-k8s/internal/corpus"
@@ -72,7 +73,8 @@ func (s *Settler) Settle(ctx context.Context, env *scc.Envelope, prov verdict.Pr
 	}
 	if !ok {
 		return refuse(env, prov, RefusedCeiling, false, fmt.Sprintf(
-			"the daily model spend ceiling of %.2f USD is reached, with %.4f USD reserved today, so the model was not called", s.Spend.Ceiling(), total)), nil
+			"the daily model spend ceiling of %s USD is reached, with %.4f USD reserved today, so the model was not called",
+			strconv.FormatFloat(s.Spend.Ceiling(), 'f', -1, 64), total)), nil
 	}
 
 	reply, err := s.Caller.Generate(ctx, prompt, s.Params)

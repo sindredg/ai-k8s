@@ -268,7 +268,8 @@ func TestTheCeilingStopsTheModelAndSurvivesARestart(t *testing.T) {
 	if out.Refusal != RefusedCeiling || out.Called || len(caller.prompts) != 2 {
 		t.Fatalf("refusal %q, called %v, calls %d", out.Refusal, out.Called, len(caller.prompts))
 	}
-	if !strings.Contains(out.Record.MissingEvidence[0], "ceiling of 0.02 USD") {
+	// Printed as configured, not rounded: a ceiling of 0.001 once read as 0.00.
+	if !strings.Contains(out.Record.MissingEvidence[0], "ceiling of 0.016 USD") {
 		t.Fatalf("the refusal does not name the ceiling: %v", out.Record.MissingEvidence)
 	}
 }

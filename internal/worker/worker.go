@@ -203,17 +203,49 @@ func (w *Worker) recordFor(ctx context.Context, key string, state ledger.State, 
 	return record, nil
 }
 
-// settle runs the rules, and asks the model only about a complete finding they left unmatched. A call
-// that does not complete is an error: nothing is on record yet, and the message goes back unacknowledged.
-func (w *Worker) settle(ctx context.Context, env *scc.Envelope, parseErr error) (verdict.Record, error) {
-	record := w.classify(env, parseErr)
-	if w.Model == nil || parseErr != nil || record.Verdict != verdict.New {
-		return record, nil
+// ErrModel marks a model call that did not complete. The message goes back unacknowledged.
+var ErrModel = errors.New("the model call did not complete")
+
+// Decide is the verdict the worker reaches for one finding, with nothing recorded, notified or
+// acknowledged. The worker and triage-eval both call it, so an evaluation scores the production path
+// and not a copy of it. A nil settler runs the rules alone.
+//
+// The rules run first, and the model is asked only about a complete finding they left unmatched. A
+// record that does not validate becomes insufficient_evidence, rather than being read for meaning.
+func Decide(ctx context.Context, idx *corpus.Index, m *model.Settler, env *scc.Envelope, parseErr error, prov verdict.Provenance) (verdict.Record, model.Outcome, error) {
+	var record verdict.Record
+	if parseErr != nil {
+		record = verdict.Insufficient(env, []string{parseErr.Error()}, prov)
+	} else {
+		record = verdict.Classify(env, idx, prov)
 	}
 
-	outcome, err := w.Model.Settle(ctx, env, w.Provenance)
+	var outcome model.Outcome
+	if m != nil && parseErr == nil && record.Verdict == verdict.New {
+		o, err := m.Settle(ctx, env, prov)
+		if err != nil {
+			return verdict.Record{}, model.Outcome{}, fmt.Errorf("%w: %w", ErrModel, err)
+		}
+		outcome, record = o, o.Record
+	}
+
+	if err := record.Validate(); err != nil {
+		record = verdict.Insufficient(env, []string{"the verdict record did not validate: " + err.Error()}, prov)
+		if err := record.Validate(); err != nil {
+			return verdict.Record{}, outcome, fmt.Errorf("even the refusal does not validate: %w", err)
+		}
+	}
+	return record, outcome, nil
+}
+
+// settle decides the verdict and counts what the model did. A call that does not complete is an
+// error: nothing is on record yet, and the message goes back unacknowledged.
+func (w *Worker) settle(ctx context.Context, env *scc.Envelope, parseErr error) (verdict.Record, error) {
+	record, outcome, err := Decide(ctx, w.Index, w.Model, env, parseErr, w.Provenance)
 	if err != nil {
-		w.Counters.Add(func(c *Counts) { c.ModelErrors++ })
+		if errors.Is(err, ErrModel) {
+			w.Counters.Add(func(c *Counts) { c.ModelErrors++ })
+		}
 		return verdict.Record{}, err
 	}
 	w.Counters.Add(func(c *Counts) {
@@ -229,15 +261,7 @@ func (w *Worker) settle(ctx context.Context, env *scc.Envelope, parseErr error) 
 			c.ModelOutputRejected++
 		}
 	})
-	return outcome.Record, nil
-}
-
-// classify settles the finding, or refuses to when a required field never arrived.
-func (w *Worker) classify(env *scc.Envelope, parseErr error) verdict.Record {
-	if parseErr != nil {
-		return verdict.Insufficient(env, []string{parseErr.Error()}, w.Provenance)
-	}
-	return verdict.Classify(env, w.Index, w.Provenance)
+	return record, nil
 }
 
 func (w *Worker) count(r verdict.Record) {
