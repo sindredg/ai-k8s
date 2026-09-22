@@ -49,3 +49,14 @@ jobs:
       - name: Build
         working-directory: ai-k8s
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./...
+
+      # Rules alone need no credential, so every case is validated and scored here. The model half is
+      # run from a workstation, and its committed result has to describe this tree: a change to the
+      # prompt, the parameters, the cases, the mapping or the controls makes it stale and fails here.
+      - name: Score the rules alone, and check the committed evaluation is not stale
+        working-directory: ai-k8s
+        run: |
+          for set in dev holdout; do
+            go run ./cmd/triage-eval -set "eval/${set}.json" -corpus corpus.json
+            go run ./cmd/triage-eval -set "eval/${set}.json" -corpus corpus.json -check "eval/results/${set}.json"
+          done

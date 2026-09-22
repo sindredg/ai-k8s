@@ -11,9 +11,11 @@ Cloud credential.
 | --- | --- | --- |
 | `cmd/corpusc` | At image build time | Compiles the corpus into one index, and fails the build on a bad entry |
 | `cmd/triage-worker` | One replica in the `agents` namespace | Pulls Security Command Center findings, settles them, records and notifies |
+| `cmd/triage-eval` | From a workstation, and rules-only in CI | Scores the worker's decisions on a reviewed set of findings |
 
-Phase 15 Increment 1 is deterministic. It calls no model, so the whole path is proven before a token
-is spent. Increment 2 adds the Vertex AI call for what the rules could not settle.
+The rules run first. Vertex AI is asked only about a complete finding the reviewed mapping left
+unmatched, and it can return `new`, `contradicts_decision` or `insufficient_evidence`, never
+`accepted`.
 
 ## The verdict contract
 
@@ -28,9 +30,9 @@ Four values, and the worker separates them rather than the model.
 
 Schema validation enforces that table. It rejects `accepted` or `contradicts_decision` with no
 resolved citation, rejects `new` when resolution returned a match, and rejects
-`insufficient_evidence` with an empty missing-evidence list. Increment 1 never returns
+`insufficient_evidence` with an empty missing-evidence list. The rules never return
 `contradicts_decision`: deterministic resolution can establish that a decision covers a resource,
-never that it fails to hold.
+never that it fails to hold. Only the model can, and only through citations that resolve.
 
 The spelling is a cross-repository contract. `terraform/modules/observability/triage.tf` alerts on
 `jsonPayload.verdict != "accepted"`, so any other spelling of `accepted` pages the platform owner.
@@ -109,6 +111,41 @@ An idle subscription is the normal state, which is why the budget is a day rathe
 The worker triages everything except `VULNERABILITY`, which covers misconfiguration, external
 exposure and threat, and any class Google adds later. The vulnerability volume is counted and
 acknowledged rather than dropped silently: it was 653 findings against 15 of everything else.
+
+## Evaluation
+
+`triage-eval` decides every case through `worker.Decide`, the function the worker calls, and scores
+two systems: the rules alone, and the rules plus the model. It writes nothing to the ledger.
+
+| File | Holds |
+| --- | --- |
+| `eval/findings.json` | Finding bodies. Real ones as delivered, and three written by hand |
+| `eval/dev.json` | Cases used while developing the prompt |
+| `eval/holdout.json` | Cases never used to change the prompt, the schema or the mapping |
+| `eval/results/<set>.json` | The last committed run, with everything it depends on in its header |
+
+Each case records the verdict it prefers, others that are defensible, and every corpus id a citation
+may name. A citation outside that list is unsupported even when it resolves, and a right verdict that
+stands on one scores as wrong. A case is `real`, `derived` (a real finding with named fields changed)
+or `synthetic`, and says which.
+
+| Measured | How |
+| --- | --- |
+| Right and preferred | Against the answer written before the run |
+| Error direction | `silenced`, `missed_contradiction`, `overconfident`, `false_contradiction`, `needless_abstention`, `unsupported_citation` |
+| Consistency | Each case asked `-repeats` times; a case whose verdict moves counts as inconsistent |
+| Latency and cost | Per call, p50 and p95, and the token estimate the worker records |
+
+```bash
+go run ./cmd/triage-eval -set eval/dev.json -corpus corpus.json                       # rules alone
+go run ./cmd/triage-eval -set eval/dev.json -corpus corpus.json -project <project> \
+  -agent-commit "$(git rev-parse HEAD)" -out eval/results/dev.json                     # with the model
+```
+
+CI scores the rules alone and fails when a committed result is stale: when the instruction, the
+schema, the parameters, the cases, the mapping or the controls moved since it ran. A change to the
+half of the corpus that `k8-lab` contributes only warns, because this repository cannot stop that
+edit and failing every unrelated pull request for it would teach people to ignore the check.
 
 ## Building
 
