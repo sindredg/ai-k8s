@@ -11,9 +11,10 @@ import (
 // controlsFile is controls.yaml: the controls this platform enforces, each pointing at the worklog that proved it.
 type controlsFile struct {
 	Controls []struct {
-		Slug      string `yaml:"slug"`
-		Statement string `yaml:"statement"`
-		Proof     string `yaml:"proof"`
+		Slug      string   `yaml:"slug"`
+		Statement string   `yaml:"statement"`
+		Proof     string   `yaml:"proof"`
+		AppliesTo []string `yaml:"applies_to"`
 	} `yaml:"controls"`
 }
 
@@ -62,10 +63,21 @@ func LoadControls(idx *Index, path string) error {
 		if strings.TrimSpace(c.Proof) == "" {
 			return fmt.Errorf("%s: control %q cites no proof", path, c.Slug)
 		}
+		// A control that names nothing it holds for can never be shown to fail on a resource, so it
+		// cannot anchor a contradiction.
+		if len(c.AppliesTo) == 0 {
+			return fmt.Errorf("%s: control %q names no resource it applies to", path, c.Slug)
+		}
+		for _, r := range c.AppliesTo {
+			if !strings.HasPrefix(r, "//") {
+				return fmt.Errorf("%s: control %q applies to %q, which is not a full resource name", path, c.Slug, r)
+			}
+		}
 		e := Entry{
-			ID:      ControlID(c.Slug),
-			Summary: c.Statement,
-			Source:  c.Proof,
+			ID:        ControlID(c.Slug),
+			Summary:   c.Statement,
+			Source:    c.Proof,
+			AppliesTo: c.AppliesTo,
 		}
 		if err := idx.Add(e); err != nil {
 			return err

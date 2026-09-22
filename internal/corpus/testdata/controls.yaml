@@ -2,6 +2,10 @@ controls:
   - slug: pod-security-restricted
     statement: The agents namespace enforces the Pod Security restricted standard at admission.
     proof: worklog/phase-15-scc-triage.md, a privileged probe Pod refused by name
+    applies_to:
+      - //k8s.io/core/v1/namespaces/agents/
   - slug: no-service-account-token
     statement: Workload Pods mount no service account token.
     proof: worklog/phase-04-workload-guardrails.md
+    applies_to:
+      - //k8s.io/core/v1/namespaces/demo/

@@ -12,6 +12,10 @@ type Entry struct {
 	Kind    Kind   `json:"kind"`
 	Summary string `json:"summary"`
 	Source  string `json:"source"`
+
+	// AppliesTo is set on controls alone: the resource names the control holds for, each a prefix of a
+	// Security Command Center resource name. A contradiction stands only on a control that applies.
+	AppliesTo []string `json:"applies_to,omitempty"`
 }
 
 // Pairing binds one Security Command Center category to corpus entries, for one concrete resource.

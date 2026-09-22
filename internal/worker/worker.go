@@ -257,7 +257,7 @@ func (w *Worker) settle(ctx context.Context, env *scc.Envelope, parseErr error) 
 			c.RefusedBudget++
 		case model.RefusedCeiling:
 			c.RefusedCeiling++
-		case model.RejectedOutput, model.RejectedCitation, model.RejectedAcceptance:
+		case model.RejectedOutput, model.RejectedCitation, model.RejectedAcceptance, model.RejectedUnanchored:
 			c.ModelOutputRejected++
 		}
 	})

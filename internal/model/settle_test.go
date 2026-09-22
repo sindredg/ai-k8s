@@ -80,7 +80,8 @@ func testIndex(t *testing.T) *corpus.Index {
 	t.Helper()
 	idx := corpus.NewIndex()
 	for _, e := range []corpus.Entry{
-		{ID: corpus.ControlID("pod-security-restricted"), Summary: "Pod Security restricted is enforced on the agents namespace.", Source: "controls.yaml"},
+		{ID: corpus.ControlID("pod-security-restricted"), Summary: "Pod Security restricted is enforced on the agents namespace.", Source: "controls.yaml",
+			AppliesTo: []string{"//k8s.io/core/v1/namespaces/agents/"}},
 		{ID: corpus.DecisionID("workload-security"), Summary: "Workloads run as non-root with every capability dropped.", Source: "decisions.md"},
 	} {
 		if err := idx.Add(e); err != nil {
@@ -163,16 +164,55 @@ func TestANewVerdictCarriesTheModelItsCostAndItsPrompt(t *testing.T) {
 	}
 }
 
+// envelopeAffecting is the privileged container finding, listing the resources it affected.
+func envelopeAffecting(t *testing.T, resources ...string) *scc.Envelope {
+	t.Helper()
+	env := envelope(t, "A Pod.")
+	affected := make([]any, 0, len(resources))
+	for _, r := range resources {
+		affected = append(affected, map[string]any{"gcpResourceName": r})
+	}
+	env.Finding.SourceProperties = map[string]any{"affectedResources": affected}
+	return env
+}
+
 func TestAContradictionStandsOnResolvedCitations(t *testing.T) {
 	s := newSettler(t, &fakeCaller{reply: ok(answerJSON("contradicts_decision", []string{"control:pod-security-restricted"}, nil))}, newMemStore(), 1)
 
-	out, _ := s.Settle(context.Background(), envelope(t, "A Pod."), prov)
+	out, _ := s.Settle(context.Background(), envelopeAffecting(t, "//k8s.io/core/v1/namespaces/agents/pods/probe"), prov)
 	r := out.Record
 	if r.Verdict != verdict.ContradictsDecision || r.CorpusMatch != verdict.MatchNone {
 		t.Fatalf("got %s with corpus_match %s", r.Verdict, r.CorpusMatch)
 	}
 	if len(r.Citations) != 1 || r.Citations[0].Summary == "" || r.Citations[0].Source != "controls.yaml" {
 		t.Fatalf("the citation was not replaced by the corpus entry: %+v", r.Citations)
+	}
+}
+
+func TestAContradictionOfSomethingElseIsNotRaised(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		cites []string
+		env   *scc.Envelope
+	}{
+		// The first scored run's false contradictions all had one of these two shapes.
+		{"a decision, which names no resource", []string{"decision:workload-security"}, envelopeAffecting(t, "//k8s.io/core/v1/namespaces/agents/pods/probe")},
+		{"a control for another namespace", []string{"control:pod-security-restricted"}, envelopeAffecting(t, "//k8s.io/core/v1/namespaces/demo/pods/probe")},
+		{"a control, and a finding naming no namespace", []string{"control:pod-security-restricted"}, envelope(t, "A Pod.")},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			s := newSettler(t, &fakeCaller{reply: ok(answerJSON("contradicts_decision", tc.cites, nil))}, newMemStore(), 1)
+			out, err := s.Settle(context.Background(), tc.env, prov)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if out.Record.Verdict != verdict.InsufficientEvidence || out.Refusal != RejectedUnanchored || !out.Called {
+				t.Fatalf("got %s, refusal %q, called %v", out.Record.Verdict, out.Refusal, out.Called)
+			}
+			if !strings.Contains(out.Record.MissingEvidence[0], tc.cites[0]) {
+				t.Fatalf("the refusal does not name what the model cited: %v", out.Record.MissingEvidence)
+			}
+		})
 	}
 }
 

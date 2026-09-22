@@ -22,6 +22,7 @@ const (
 	RejectedOutput     Refusal = "invalid_output"
 	RejectedCitation   Refusal = "unresolved_citation"
 	RejectedAcceptance Refusal = "model_accepted"
+	RejectedUnanchored Refusal = "unanchored_contradiction"
 )
 
 // Outcome is one settled finding. Called says whether money was spent on it.
@@ -124,6 +125,14 @@ func (s *Settler) Settle(ctx context.Context, env *scc.Envelope, prov verdict.Pr
 		if err := record.ResolveCitations(s.Index); err != nil {
 			return s.rejected(env, prov, RejectedCitation, "the model "+err.Error()), nil
 		}
+		// A citation that resolves can still be about something else. The contradiction stands only on
+		// a control that applies to a resource this finding names; a decision about another cluster, or
+		// one that accepts the very gap reported, is not shown failing by it.
+		if !anchored(record.Citations, s.Index, env.Finding) {
+			return s.rejected(env, prov, RejectedUnanchored, fmt.Sprintf(
+				"the model called this a contradiction of %s, and none of those is a control that applies to a resource the finding names, so no contradiction was raised",
+				citationList(record.Citations))), nil
+		}
 	case verdict.InsufficientEvidence:
 		record.Verdict = verdict.InsufficientEvidence
 		record.MissingEvidence = a.MissingEvidence
@@ -138,6 +147,52 @@ func (s *Settler) Settle(ctx context.Context, env *scc.Envelope, prov verdict.Pr
 	}
 	out.Record = record
 	return out, nil
+}
+
+// anchored says whether a cited control applies to a resource the finding names. Only controls carry
+// the resources they hold for, so a contradiction of a decision, a baseline entry or a threat alone
+// does not stand.
+//
+// The affected resources come from sourceProperties, which a resource's creator can partly shape. A
+// forged entry can only anchor a contradiction, which notifies, and cannot quiet a finding.
+func anchored(cites []verdict.Citation, idx *corpus.Index, f scc.Finding) bool {
+	names := resourcesOf(f)
+	for _, c := range cites {
+		e, ok := idx.Lookup(c.ID)
+		if !ok {
+			continue
+		}
+		for _, prefix := range e.AppliesTo {
+			for _, n := range names {
+				if strings.HasPrefix(n, prefix) {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+// resourcesOf is the resource the finding is filed against and every affected resource it lists.
+func resourcesOf(f scc.Finding) []string {
+	names := []string{f.ResourceName}
+	affected, _ := f.SourceProperties["affectedResources"].([]any)
+	for _, item := range affected {
+		if m, ok := item.(map[string]any); ok {
+			if name, ok := m["gcpResourceName"].(string); ok && name != "" {
+				names = append(names, name)
+			}
+		}
+	}
+	return names
+}
+
+func citationList(cites []verdict.Citation) string {
+	ids := make([]string, 0, len(cites))
+	for _, c := range cites {
+		ids = append(ids, string(c.ID))
+	}
+	return strings.Join(ids, ", ")
 }
 
 // stamp records what makes the verdict reproducible and what it cost.

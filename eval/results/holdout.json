@@ -13,12 +13,12 @@
       "ThinkingBudget": 0
     },
     "prompt_digest": "sha256:9efeaea443f0f4926d86efd1009a804a462508bd1713a3a2b14f356207a0ad52",
-    "local_corpus_digest": "sha256:fcd9a867d40925dc0afe6bb00d48a094d05a701d3b243f14f90454bbcc74b5bf",
+    "local_corpus_digest": "sha256:1fce03c9d8cd2a6f973e53618b071d6c3cb934addd547074b01d4533c0790aa9",
     "upstream_corpus_digest": "sha256:a766d1616831db1db3e7f089554a50da85f307709a2fd50759bee58a589b0d0d",
-    "agent_commit": "025de951df988a33632f85c37eaea90550bdfd4d",
-    "corpus_commit": "0beb50765810d08a2850d581729d25d43be947f3",
+    "agent_commit": "94c0ecf9e3e888504da8e3534624179aaf468a4d",
+    "corpus_commit": "ebfe8c5db2a796230a083ae5dbd3fc815889bfac",
     "repeats": 5,
-    "ran_at": "2026-09-22T12:21:56Z"
+    "ran_at": "2026-09-22T13:49:25Z"
   },
   "summaries": [
     {
@@ -68,19 +68,16 @@
       "system": "rules+model",
       "cases": 7,
       "runs": 35,
-      "right": 27,
-      "preferred": 20,
-      "runs_with_unsupported_citations": 1,
+      "right": 35,
+      "preferred": 23,
+      "runs_with_unsupported_citations": 0,
       "calls_failed": 0,
-      "cases_right_every_run": 5,
+      "cases_right_every_run": 7,
       "cases_inconsistent": 1,
-      "errors": {
-        "false_contradiction": 5,
-        "overconfident": 3
-      },
+      "errors": {},
       "by_kind": {
         "ambiguous": {
-          "right": 7,
+          "right": 10,
           "runs": 10
         },
         "contradiction": {
@@ -88,7 +85,7 @@
           "runs": 5
         },
         "misleading": {
-          "right": 5,
+          "right": 10,
           "runs": 10
         },
         "missing_evidence": {
@@ -101,11 +98,11 @@
         }
       },
       "model_calls": 25,
-      "latency_p50_ms": 1441,
-      "latency_p95_ms": 1870,
+      "latency_p50_ms": 1250,
+      "latency_p95_ms": 2210,
       "input_tokens": 227055,
-      "output_tokens": 3324,
-      "cost_usd": 0.07642650000000002
+      "output_tokens": 3281,
+      "cost_usd": 0.07631900000000001
     }
   ],
   "cases": {
@@ -344,101 +341,93 @@
         ],
         "runs": [
           {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "decision:ingress-mechanism"
-            ],
+            "verdict": "insufficient_evidence",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 2267,
+            "refusal": "unanchored_contradiction",
+            "latency_ms": 1556,
             "input_tokens": 8687,
             "output_tokens": 129,
             "cost_usd": 0.0029286,
-            "reasoning": "The finding asserts that a service is externally exposed via a load balancer. The decision:ingress-mechanism states that the platform publishes through a Gateway, not an Ingress object. This finding contradicts the stated ingress mechanism.",
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model called this a contradiction of decision:ingress-mechanism, and none of those is a control that applies to a resource the finding names, so no contradiction was raised"
+            ],
             "judgement": {
-              "right": false,
-              "preferred": false,
-              "error": "false_contradiction"
+              "right": true,
+              "preferred": false
             }
           },
           {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "decision:ingress-mechanism"
-            ],
+            "verdict": "insufficient_evidence",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1441,
+            "refusal": "unanchored_contradiction",
+            "latency_ms": 1190,
             "input_tokens": 8687,
             "output_tokens": 129,
             "cost_usd": 0.0029286,
-            "reasoning": "The finding asserts that a service is externally exposed via a load balancer. The decision:ingress-mechanism states that the platform publishes through a Gateway, not an Ingress object. This finding contradicts the stated ingress mechanism.",
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model called this a contradiction of decision:ingress-mechanism, and none of those is a control that applies to a resource the finding names, so no contradiction was raised"
+            ],
             "judgement": {
-              "right": false,
-              "preferred": false,
-              "error": "false_contradiction"
+              "right": true,
+              "preferred": false
             }
           },
           {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "decision:ingress-mechanism"
-            ],
+            "verdict": "insufficient_evidence",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1149,
+            "refusal": "unanchored_contradiction",
+            "latency_ms": 1119,
             "input_tokens": 8687,
             "output_tokens": 129,
             "cost_usd": 0.0029286,
-            "reasoning": "The finding asserts that a service is externally exposed via a load balancer. The decision:ingress-mechanism states that the platform publishes through a Gateway, not an Ingress object. This finding contradicts the stated ingress mechanism.",
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model called this a contradiction of decision:ingress-mechanism, and none of those is a control that applies to a resource the finding names, so no contradiction was raised"
+            ],
             "judgement": {
-              "right": false,
-              "preferred": false,
-              "error": "false_contradiction"
+              "right": true,
+              "preferred": false
             }
           },
           {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "decision:ingress-mechanism"
-            ],
+            "verdict": "insufficient_evidence",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1199,
+            "refusal": "unanchored_contradiction",
+            "latency_ms": 1250,
             "input_tokens": 8687,
             "output_tokens": 129,
             "cost_usd": 0.0029286,
-            "reasoning": "The finding asserts that a service is externally exposed via a load balancer. The decision:ingress-mechanism states that the platform publishes through a Gateway, not an Ingress object. This finding contradicts the stated ingress mechanism.",
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model called this a contradiction of decision:ingress-mechanism, and none of those is a control that applies to a resource the finding names, so no contradiction was raised"
+            ],
             "judgement": {
-              "right": false,
-              "preferred": false,
-              "error": "false_contradiction"
+              "right": true,
+              "preferred": false
             }
           },
           {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "decision:ingress-mechanism",
-              "decision:external-address-ownership",
-              "control:tls-floor-and-rate-limit",
-              "decision:edge-rate-limiting"
-            ],
+            "verdict": "insufficient_evidence",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1870,
+            "refusal": "unanchored_contradiction",
+            "latency_ms": 1217,
             "input_tokens": 8687,
-            "output_tokens": 156,
-            "cost_usd": 0.0029961000000000002,
-            "reasoning": "The finding asserts an externally exposed service via a load balancer on port 443. The platform's decisions state that ingress is via a Gateway, an external address is reserved, and there are controls for TLS and rate limiting. This finding suggests that despite these decisions, an external exposure exists that may not be properly secured.",
+            "output_tokens": 129,
+            "cost_usd": 0.0029286,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model called this a contradiction of decision:ingress-mechanism, and none of those is a control that applies to a resource the finding names, so no contradiction was raised"
+            ],
             "judgement": {
-              "right": false,
-              "preferred": false,
-              "unsupported": [
-                "decision:external-address-ownership",
-                "control:tls-floor-and-rate-limit",
-                "decision:edge-rate-limiting"
-              ],
-              "error": "false_contradiction"
+              "right": true,
+              "preferred": false
             }
           }
         ]
@@ -453,10 +442,28 @@
         ],
         "runs": [
           {
+            "verdict": "insufficient_evidence",
+            "settled_by": "model",
+            "called": true,
+            "refusal": "unanchored_contradiction",
+            "latency_ms": 1318,
+            "input_tokens": 9058,
+            "output_tokens": 124,
+            "cost_usd": 0.0030274,
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model called this a contradiction of decision:supply-chain-control-timing, threat:10, and none of those is a control that applies to a resource the finding names, so no contradiction was raised"
+            ],
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
             "verdict": "new",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1300,
+            "latency_ms": 2373,
             "input_tokens": 9058,
             "output_tokens": 99,
             "cost_usd": 0.0029649,
@@ -467,29 +474,28 @@
             }
           },
           {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "decision:supply-chain-control-timing",
-              "threat:10"
-            ],
+            "verdict": "insufficient_evidence",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1594,
+            "refusal": "unanchored_contradiction",
+            "latency_ms": 1239,
             "input_tokens": 9058,
             "output_tokens": 124,
             "cost_usd": 0.0030274,
-            "reasoning": "The finding asserts that Binary Authorization is disabled on the GKE cluster. This contradicts the decision to defer acceptance of provenance, SBOM, signing, and admission enforcement, which implies Binary Authorization would eventually be enabled. It also contradicts the accepted threat that there is no provenance, SBOM, signature, or admission policy.",
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model called this a contradiction of decision:supply-chain-control-timing, threat:10, and none of those is a control that applies to a resource the finding names, so no contradiction was raised"
+            ],
             "judgement": {
-              "right": false,
-              "preferred": false,
-              "error": "overconfident"
+              "right": true,
+              "preferred": true
             }
           },
           {
             "verdict": "new",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1153,
+            "latency_ms": 1568,
             "input_tokens": 9058,
             "output_tokens": 99,
             "cost_usd": 0.0029649,
@@ -500,41 +506,21 @@
             }
           },
           {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "decision:supply-chain-control-timing",
-              "threat:10"
-            ],
+            "verdict": "insufficient_evidence",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1390,
+            "refusal": "unanchored_contradiction",
+            "latency_ms": 1180,
             "input_tokens": 9058,
             "output_tokens": 124,
             "cost_usd": 0.0030274,
-            "reasoning": "The finding asserts that Binary Authorization is disabled on the GKE cluster. This contradicts the decision to defer acceptance of provenance, SBOM, signing, and admission enforcement, which implies Binary Authorization would eventually be enabled. It also contradicts the accepted threat that there is no provenance, SBOM, signature, or admission policy.",
-            "judgement": {
-              "right": false,
-              "preferred": false,
-              "error": "overconfident"
-            }
-          },
-          {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "decision:supply-chain-control-timing",
-              "threat:10"
+            "reasoning": "The worker refused to rule. What is missing is listed rather than guessed at.",
+            "missing_evidence": [
+              "the model called this a contradiction of decision:supply-chain-control-timing, threat:10, and none of those is a control that applies to a resource the finding names, so no contradiction was raised"
             ],
-            "settled_by": "model",
-            "called": true,
-            "latency_ms": 1280,
-            "input_tokens": 9058,
-            "output_tokens": 124,
-            "cost_usd": 0.0030274,
-            "reasoning": "The finding asserts that Binary Authorization is disabled on the GKE cluster. This contradicts the decision to defer acceptance of provenance, SBOM, signing, and admission enforcement, which implies Binary Authorization would eventually be enabled. It also contradicts the accepted threat that there is no provenance, SBOM, signature, or admission policy.",
             "judgement": {
-              "right": false,
-              "preferred": false,
-              "error": "overconfident"
+              "right": true,
+              "preferred": true
             }
           }
         ]
@@ -556,7 +542,25 @@
             ],
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1703,
+            "latency_ms": 1247,
+            "input_tokens": 8680,
+            "output_tokens": 130,
+            "cost_usd": 0.002929,
+            "reasoning": "The finding asserts that the SSL policy allows TLS 1.0, which contradicts the control that states the public endpoint refuses TLS 1.0 and 1.1. This also directly contradicts the mitigation recorded in threat:5, which states TLS 1.2 is the floor.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:tls-floor-and-rate-limit",
+              "threat:5"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1729,
             "input_tokens": 8680,
             "output_tokens": 178,
             "cost_usd": 0.003049,
@@ -592,11 +596,11 @@
             ],
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1660,
+            "latency_ms": 2210,
             "input_tokens": 8680,
-            "output_tokens": 178,
-            "cost_usd": 0.003049,
-            "reasoning": "The finding asserts that the SSL policy allows TLS 1.0 as its minimum version. This contradicts the control 'tls-floor-and-rate-limit' which states the public endpoint refuses TLS 1.0 and 1.1. It also contradicts the closed threat 'threat:5' which stated TLS 1.2 floor, both refused.",
+            "output_tokens": 130,
+            "cost_usd": 0.002929,
+            "reasoning": "The finding asserts that the SSL policy allows TLS 1.0, which contradicts the control that states the public endpoint refuses TLS 1.0 and 1.1. This also directly contradicts the mitigation recorded in threat:5, which states TLS 1.2 is the floor.",
             "judgement": {
               "right": true,
               "preferred": true
@@ -610,25 +614,7 @@
             ],
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1756,
-            "input_tokens": 8680,
-            "output_tokens": 178,
-            "cost_usd": 0.003049,
-            "reasoning": "The finding asserts that the SSL policy allows TLS 1.0 as its minimum version. This contradicts the control 'tls-floor-and-rate-limit' which states the public endpoint refuses TLS 1.0 and 1.1. It also contradicts the closed threat 'threat:5' which stated TLS 1.2 floor, both refused.",
-            "judgement": {
-              "right": true,
-              "preferred": true
-            }
-          },
-          {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "control:tls-floor-and-rate-limit",
-              "threat:5"
-            ],
-            "settled_by": "model",
-            "called": true,
-            "latency_ms": 1588,
+            "latency_ms": 1884,
             "input_tokens": 8680,
             "output_tokens": 178,
             "cost_usd": 0.003049,
@@ -656,7 +642,24 @@
             ],
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1606,
+            "latency_ms": 1202,
+            "input_tokens": 9715,
+            "output_tokens": 127,
+            "cost_usd": 0.003232,
+            "reasoning": "The finding asserts that a privileged container was launched in the 'demo' namespace. However, the 'control:pod-security-baseline-demo' entry states that the 'demo' namespace enforces the Pod Security baseline standard, which should refuse a privileged Pod. This indicates a contradiction between the finding and the recorded control.",
+            "judgement": {
+              "right": true,
+              "preferred": false
+            }
+          },
+          {
+            "verdict": "contradicts_decision",
+            "citations": [
+              "control:pod-security-baseline-demo"
+            ],
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1455,
             "input_tokens": 9715,
             "output_tokens": 167,
             "cost_usd": 0.003332,
@@ -673,7 +676,7 @@
             ],
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1238,
+            "latency_ms": 1141,
             "input_tokens": 9715,
             "output_tokens": 127,
             "cost_usd": 0.003232,
@@ -690,11 +693,11 @@
             ],
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1254,
+            "latency_ms": 1421,
             "input_tokens": 9715,
-            "output_tokens": 127,
-            "cost_usd": 0.003232,
-            "reasoning": "The finding asserts that a privileged container was launched in the 'demo' namespace. However, the 'control:pod-security-baseline-demo' entry states that the 'demo' namespace enforces the Pod Security baseline standard, which should refuse a privileged Pod. This indicates a contradiction between the finding and the recorded control.",
+            "output_tokens": 167,
+            "cost_usd": 0.003332,
+            "reasoning": "The finding asserts that a privileged container was launched in the `demo` namespace. This contradicts the `control:pod-security-baseline-demo` decision, which states that the `demo` namespace enforces the Pod Security baseline standard and audits against restricted, meaning a privileged Pod should be refused. The finding indicates that this control did not prevent the launch of a privileged container.",
             "judgement": {
               "right": true,
               "preferred": false
@@ -707,28 +710,11 @@
             ],
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1627,
+            "latency_ms": 1523,
             "input_tokens": 9715,
-            "output_tokens": 127,
-            "cost_usd": 0.003232,
-            "reasoning": "The finding asserts that a privileged container was launched in the 'demo' namespace. However, the 'control:pod-security-baseline-demo' entry states that the 'demo' namespace enforces the Pod Security baseline standard, which should refuse a privileged Pod. This indicates a contradiction between the finding and the recorded control.",
-            "judgement": {
-              "right": true,
-              "preferred": false
-            }
-          },
-          {
-            "verdict": "contradicts_decision",
-            "citations": [
-              "control:pod-security-baseline-demo"
-            ],
-            "settled_by": "model",
-            "called": true,
-            "latency_ms": 1236,
-            "input_tokens": 9715,
-            "output_tokens": 127,
-            "cost_usd": 0.003232,
-            "reasoning": "The finding asserts that a privileged container was launched in the 'demo' namespace. However, the 'control:pod-security-baseline-demo' entry states that the 'demo' namespace enforces the Pod Security baseline standard, which should refuse a privileged Pod. This indicates a contradiction between the finding and the recorded control.",
+            "output_tokens": 167,
+            "cost_usd": 0.003332,
+            "reasoning": "The finding asserts that a privileged container was launched in the `demo` namespace. This contradicts the `control:pod-security-baseline-demo` decision, which states that the `demo` namespace enforces the Pod Security baseline standard and audits against restricted, meaning a privileged Pod should be refused. The finding indicates that this control did not prevent the launch of a privileged container.",
             "judgement": {
               "right": true,
               "preferred": false
@@ -749,21 +735,7 @@
             "verdict": "new",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1866,
-            "input_tokens": 9271,
-            "output_tokens": 107,
-            "cost_usd": 0.0030487999999999995,
-            "reasoning": "The finding asserts that a service account was created in the sensitive 'kube-system' namespace. The corpus does not contain any decisions or controls related to service account creation in sensitive namespaces within GKE. Therefore, this is a new finding for the platform.",
-            "judgement": {
-              "right": true,
-              "preferred": true
-            }
-          },
-          {
-            "verdict": "new",
-            "settled_by": "model",
-            "called": true,
-            "latency_ms": 1544,
+            "latency_ms": 1181,
             "input_tokens": 9271,
             "output_tokens": 117,
             "cost_usd": 0.0030738,
@@ -777,21 +749,7 @@
             "verdict": "new",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1753,
-            "input_tokens": 9271,
-            "output_tokens": 107,
-            "cost_usd": 0.0030487999999999995,
-            "reasoning": "The finding asserts that a service account was created in the sensitive 'kube-system' namespace. The corpus does not contain any decisions or controls related to service account creation in sensitive namespaces within GKE. Therefore, this is a new finding for the platform.",
-            "judgement": {
-              "right": true,
-              "preferred": true
-            }
-          },
-          {
-            "verdict": "new",
-            "settled_by": "model",
-            "called": true,
-            "latency_ms": 1232,
+            "latency_ms": 1110,
             "input_tokens": 9271,
             "output_tokens": 117,
             "cost_usd": 0.0030738,
@@ -805,7 +763,35 @@
             "verdict": "new",
             "settled_by": "model",
             "called": true,
-            "latency_ms": 1179,
+            "latency_ms": 1497,
+            "input_tokens": 9271,
+            "output_tokens": 107,
+            "cost_usd": 0.0030487999999999995,
+            "reasoning": "The finding asserts that a service account was created in the sensitive 'kube-system' namespace. The corpus does not contain any decisions or controls related to service account creation in sensitive namespaces within GKE. Therefore, this is a new finding for the platform.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1140,
+            "input_tokens": 9271,
+            "output_tokens": 107,
+            "cost_usd": 0.0030487999999999995,
+            "reasoning": "The finding asserts that a service account was created in the sensitive 'kube-system' namespace. The corpus does not contain any decisions or controls related to service account creation in sensitive namespaces within GKE. Therefore, this is a new finding for the platform.",
+            "judgement": {
+              "right": true,
+              "preferred": true
+            }
+          },
+          {
+            "verdict": "new",
+            "settled_by": "model",
+            "called": true,
+            "latency_ms": 1125,
             "input_tokens": 9271,
             "output_tokens": 117,
             "cost_usd": 0.0030738,
