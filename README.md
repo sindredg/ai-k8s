@@ -32,7 +32,10 @@ Schema validation enforces that table. It rejects `accepted` or `contradicts_dec
 resolved citation, rejects `new` when resolution returned a match, and rejects
 `insufficient_evidence` with an empty missing-evidence list. The rules never return
 `contradicts_decision`: deterministic resolution can establish that a decision covers a resource,
-never that it fails to hold. Only the model can, and only through citations that resolve.
+never that it fails to hold. Only the model can, and only when a cited control applies to a
+resource the finding names. A contradiction resting on a decision, a baseline entry, a threat, or a
+control for something else lands as `insufficient_evidence`, naming what the model claimed. Before
+that check the model raised 15 false contradictions in 125 evaluation runs, and after it none.
 
 The spelling is a cross-repository contract. `terraform/modules/observability/triage.tf` alerts on
 `jsonPayload.verdict != "accepted"`, so any other spelling of `accepted` pages the platform owner.
@@ -47,7 +50,7 @@ a corpus source at runtime, so nothing it cites can change under it and no egres
 | `.checkov.baseline` | k8-lab | `checkov:<check>:<address>` |
 | `reference/threat-model.md` findings table | k8-lab | `threat:<n>` |
 | `decisions.md` headings carrying a `Decision:` line | k8-lab | `decision:<anchor>` |
-| `corpus/controls.yaml` | here | `control:<slug>` |
+| `corpus/controls.yaml` | here | `control:<slug>`, with the resources each control applies to |
 | `corpus/mapping.yaml` | here | The category pairings, which cite the four above |
 
 A citation is one of those ids and nothing else, and resolution is an exact lookup. Name-based
